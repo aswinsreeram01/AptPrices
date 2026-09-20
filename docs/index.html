@@ -37,6 +37,10 @@
   --series-windridge: #9085e9;
 }
 * { box-sizing: border-box; }
+/* Must outrank the class rules below: .card sets display:flex, which otherwise
+   beats the UA stylesheet's [hidden]{display:none} and leaves filtered-out
+   cards on screen. */
+[hidden] { display: none !important; }
 body {
   margin: 0; background: var(--page); color: var(--ink);
   font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -103,7 +107,13 @@ body {
   font: inherit; font-size: .82rem; padding: 3px 6px; color: var(--ink);
   background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
 }
-.filterbar output { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; min-width: 52px; }
+.filterbar .numwrap { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.filterbar input[type=number] {
+  width: 68px; font: inherit; font-weight: 600; font-variant-numeric: tabular-nums;
+  padding: 3px 4px; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 6px;
+}
+.filterbar input[type=number]:focus-visible { outline: 2px solid var(--series-davenport); outline-offset: 1px; }
 .fcount { color: var(--muted); font-size: .8rem; margin-left: auto; }
 .units { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .unit-row {
@@ -135,7 +145,7 @@ footer a { color: inherit; }
   </header>
   <div class="tiles">
     <div class="tile"><div class="v" id="t-homes">46</div><div class="k">homes available</div></div>
-    <div class="tile"><div class="v" id="t-cheap">$716</div><div class="k">cheapest · A5</div></div>
+    <div class="tile"><div class="v" id="t-cheap">$716</div><div class="k">cheapest<span id="t-cheap-plan"> · A5</span></div></div>
     <div class="tile"><div class="v">25</div><div class="k">floor plans</div></div>
   </div>
   <div class="sortbar" role="toolbar" aria-label="Sort listings">
@@ -145,9 +155,11 @@ footer a { color: inherit; }
     <button type="button" class="sortbtn" data-sort="psf" data-dir="asc">$/sqft</button>
   </div>
   <div class="filterbar" role="group" aria-label="Filter listings">
-    <label class="fl" for="f-rent">max rent
-      <input type="range" id="f-rent" min="650" max="1200" step="25" value="1200">
-      <output id="f-rent-out">$1,200</output>
+    <label class="fl" for="f-rent-num">max rent
+      <input type="range" id="f-rent" min="650" max="1200" step="25" value="1200"
+             aria-label="max rent slider">
+      <span class="numwrap">$<input type="number" id="f-rent-num" min="0" max="1200" step="25"
+             value="1200" inputmode="numeric"></span>
     </label>
     <label class="fl" for="f-date">available by
       <input type="date" id="f-date" value="">
@@ -450,7 +462,7 @@ footer a { color: inherit; }
   </details>
 </section>
   <footer>
-    <p>Updated Sun, 20 Sep 2026 18:16:00 GMT. Prices are each property's advertised base rent for the cheapest
+    <p>Updated Sun, 20 Sep 2026 18:24:15 GMT. Prices are each property's advertised base rent for the cheapest
     lease term and change frequently — confirm on the property's own page before acting.
     Cards group units by floor plan; each unit lists its own price and move-in date.
     Floor plan images load directly from each property's website and belong to them.</p>
@@ -461,7 +473,7 @@ footer a { color: inherit; }
 (function () {
   var buttons = document.querySelectorAll('.sortbtn[data-sort]');
   var rentEl = document.getElementById('f-rent');
-  var rentOut = document.getElementById('f-rent-out');
+  var rentNum = document.getElementById('f-rent-num');
   var dateEl = document.getElementById('f-date');
   var resetEl = document.getElementById('f-reset');
   var countEl = document.getElementById('f-count');
@@ -490,11 +502,18 @@ footer a { color: inherit; }
     return true;
   }
 
+  // The typed box is the source of truth - the slider can only reach its own
+  // min, but someone may type below it, and that should still filter.
+  function currentMaxRent() {
+    var v = parseInt(rentNum.value, 10);
+    if (isNaN(v)) return RENT_MAX;
+    return Math.max(0, Math.min(RENT_MAX, v));
+  }
+
   function applyFilters() {
-    var maxRent = parseInt(rentEl.value, 10);
+    var maxRent = currentMaxRent();
     var byDate = dateEl.value || '';
-    rentOut.textContent = usd(maxRent);
-    var shownHomes = 0, cheapest = null;
+    var shownHomes = 0, cheapest = null, cheapestPlan = '';
 
     document.querySelectorAll('section.property').forEach(function (sec) {
       var visibleCards = 0, secHomes = 0, secFrom = null;
@@ -525,6 +544,7 @@ footer a { color: inherit; }
         if (anyVisible) {
           visibleCards++;
           secHomes += cardHomes;
+          var planName = (card.querySelector('h3') || {}).textContent || '';
           // Headline price follows the cheapest unit that survived the filter.
           var amt = card.querySelector('.price .amt');
           if (amt && cardFrom !== null) amt.textContent = usd(cardFrom);
@@ -533,7 +553,7 @@ footer a { color: inherit; }
             var sq = parseFloat(card.dataset.sqft || 0);
             if (sq) card.dataset.psf = (cardFrom / sq).toFixed(3);
             if (secFrom === null || cardFrom < secFrom) secFrom = cardFrom;
-            if (cheapest === null || cardFrom < cheapest) cheapest = cardFrom;
+            if (cheapest === null || cardFrom < cheapest) { cheapest = cardFrom; cheapestPlan = planName; }
           }
         }
       });
@@ -557,6 +577,8 @@ footer a { color: inherit; }
     var cheapEl = document.getElementById('t-cheap');
     if (homesEl) homesEl.textContent = shownHomes;
     if (cheapEl) cheapEl.textContent = cheapest === null ? '—' : usd(cheapest);
+    var cheapPlanEl = document.getElementById('t-cheap-plan');
+    if (cheapPlanEl) cheapPlanEl.textContent = cheapestPlan ? ' · ' + cheapestPlan : '';
     countEl.textContent = filtered ? shownHomes + ' of ' + countEl.dataset.total + ' homes match' : '';
     sortNow();
   }
@@ -580,10 +602,26 @@ footer a { color: inherit; }
     });
   });
 
-  rentEl.addEventListener('input', applyFilters);
+  rentEl.addEventListener('input', function () {
+    rentNum.value = rentEl.value;
+    applyFilters();
+  });
+  // Filter as they type, but only rewrite the box on commit - clamping mid-entry
+  // fights the typist (typing "8" toward 800 would snap to the minimum).
+  rentNum.addEventListener('input', function () {
+    if (rentNum.value === '' || isNaN(parseInt(rentNum.value, 10))) return;
+    rentEl.value = Math.max(parseInt(rentEl.min, 10), currentMaxRent());
+    applyFilters();
+  });
+  rentNum.addEventListener('change', function () {
+    rentNum.value = currentMaxRent();
+    rentEl.value = Math.max(parseInt(rentEl.min, 10), currentMaxRent());
+    applyFilters();
+  });
   dateEl.addEventListener('change', applyFilters);
   resetEl.addEventListener('click', function () {
     rentEl.value = RENT_MAX;
+    rentNum.value = RENT_MAX;
     dateEl.value = '';
     applyFilters();
   });
