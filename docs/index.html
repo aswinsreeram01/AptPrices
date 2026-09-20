@@ -96,6 +96,30 @@ body {
   padding: 4px 14px; cursor: pointer;
 }
 .sortbtn:hover { border-color: var(--muted); }
+.filterbar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 10px 0 2px; }
+.filterbar .fl { display: flex; align-items: center; gap: 7px; color: var(--ink-2); font-size: .82rem; }
+.filterbar input[type=range] { width: 140px; accent-color: var(--series-davenport); }
+.filterbar input[type=date] {
+  font: inherit; font-size: .82rem; padding: 3px 6px; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+}
+.filterbar output { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; min-width: 52px; }
+.fcount { color: var(--muted); font-size: .8rem; margin-left: auto; }
+.units { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.unit-row {
+  display: grid; grid-template-columns: 1fr auto auto auto; gap: 8px; align-items: baseline;
+  font-size: .8rem; padding: 2px 0; border-top: 1px solid var(--grid);
+  font-variant-numeric: tabular-nums;
+}
+.unit-row .u { color: var(--ink-2); }
+.unit-row .p { font-weight: 600; color: var(--ink); }
+.unit-row .d { color: var(--ink-2); }
+.unit-row .d.nowd { color: var(--good); font-weight: 600; }
+.unit-row .s { color: var(--muted); }
+.unit-row[hidden] { display: none; }
+.nounits { margin: 6px 0 0; font-size: .78rem; color: var(--muted); }
+.price .fromlbl { font-size: .72rem; font-weight: 400; color: var(--muted); }
+.nomatch { color: var(--ink-2); font-size: .88rem; }
 .sortbtn.active { color: var(--ink); font-weight: 600; border-color: var(--ink-2); }
 .sortbtn.active::after { content: " ▲"; font-size: .7em; }
 .sortbtn.active[data-dir="desc"]::after { content: " ▼"; font-size: .7em; }
@@ -107,12 +131,12 @@ footer a { color: inherit; }
 <div class="wrap">
   <header class="masthead">
     <h1>DFW Rent Watch</h1>
-    <p class="tagline">Apartments under $1,200 · 625+ sqft · tracked hourly across three properties</p>
+    <p class="tagline">Apartments under $1,200 · 625+ sqft · tracked hourly across 4 properties</p>
   </header>
   <div class="tiles">
-    <div class="tile"><div class="v">46</div><div class="k">homes available</div></div>
-    <div class="tile"><div class="v">$716</div><div class="k">cheapest · A5</div></div>
-    <div class="tile"><div class="v">32</div><div class="k">tracked listings</div></div>
+    <div class="tile"><div class="v" id="t-homes">46</div><div class="k">homes available</div></div>
+    <div class="tile"><div class="v" id="t-cheap">$716</div><div class="k">cheapest · A5</div></div>
+    <div class="tile"><div class="v">25</div><div class="k">floor plans</div></div>
   </div>
   <div class="sortbar" role="toolbar" aria-label="Sort listings">
     <span class="sortlabel">sort by</span>
@@ -120,348 +144,334 @@ footer a { color: inherit; }
     <button type="button" class="sortbtn" data-sort="sqft" data-dir="desc">sqft</button>
     <button type="button" class="sortbtn" data-sort="psf" data-dir="asc">$/sqft</button>
   </div>
+  <div class="filterbar" role="group" aria-label="Filter listings">
+    <label class="fl" for="f-rent">max rent
+      <input type="range" id="f-rent" min="650" max="1200" step="25" value="1200">
+      <output id="f-rent-out">$1,200</output>
+    </label>
+    <label class="fl" for="f-date">available by
+      <input type="date" id="f-date" value="">
+    </label>
+    <button type="button" id="f-reset" class="sortbtn">reset</button>
+    <span class="fcount" id="f-count"></span>
+  </div>
   <section class="property" id="davenport" style="--series:var(--series-davenport)">
   <h2><span class="dot" aria-hidden="true"></span>Davenport
-    <span class="sub">27 homes · from $753</span>
+    <span class="sub"><span class="cnt">27</span> homes · from <span class="frm">$753</span></span>
     <a class="srclink" href="https://www.davenport-apts.com/floorplans" target="_blank" rel="noopener">view on site ↗</a>
   </h2>
-  <div class="grid"><article class="card" style="--series:var(--series-davenport)" data-price="753" data-sqft="651" data-psf="1.157">
+  <div class="grid"><article class="card" style="--series:var(--series-davenport)" data-price="753" data-sqft="651" data-psf="1.157" data-basefrom="753">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a3" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3710347_2-224-5_2d_web.jpg" alt="A3 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A3</h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$753<span class="permo">/mo</span> </p>
-    <p class="meta">651 sqft · 1 bed · 3 homes left · <span class="psf">$1.16/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $753 to $872"><polyline points="4.0,12.0 9.7,12.0 15.4,12.0 21.0,12.0 26.7,12.0 32.4,12.0 38.1,12.0 43.8,12.0 49.4,12.0 55.1,12.0 60.8,12.0 66.5,12.0 72.2,12.0 77.8,14.0 83.5,14.0 89.2,14.0 94.9,14.0 100.6,14.0 106.2,14.0 111.9,14.0 117.6,14.0 123.3,14.0 129.0,14.0 134.6,36.0 140.3,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>08-26: $872</title></circle><circle cx="9.7" cy="12.0" r="5" fill="transparent"><title>08-27: $872</title></circle><circle cx="15.4" cy="12.0" r="5" fill="transparent"><title>08-28: $872</title></circle><circle cx="21.0" cy="12.0" r="5" fill="transparent"><title>08-29: $872</title></circle><circle cx="26.7" cy="12.0" r="5" fill="transparent"><title>08-30: $872</title></circle><circle cx="32.4" cy="12.0" r="5" fill="transparent"><title>08-31: $872</title></circle><circle cx="38.1" cy="12.0" r="5" fill="transparent"><title>09-01: $872</title></circle><circle cx="43.8" cy="12.0" r="5" fill="transparent"><title>09-02: $872</title></circle><circle cx="49.4" cy="12.0" r="5" fill="transparent"><title>09-03: $872</title></circle><circle cx="55.1" cy="12.0" r="5" fill="transparent"><title>09-04: $872</title></circle><circle cx="60.8" cy="12.0" r="5" fill="transparent"><title>09-05: $872</title></circle><circle cx="66.5" cy="12.0" r="5" fill="transparent"><title>09-06: $872</title></circle><circle cx="72.2" cy="12.0" r="5" fill="transparent"><title>09-07: $872</title></circle><circle cx="77.8" cy="14.0" r="5" fill="transparent"><title>09-08: $862</title></circle><circle cx="83.5" cy="14.0" r="5" fill="transparent"><title>09-09: $862</title></circle><circle cx="89.2" cy="14.0" r="5" fill="transparent"><title>09-10: $862</title></circle><circle cx="94.9" cy="14.0" r="5" fill="transparent"><title>09-11: $862</title></circle><circle cx="100.6" cy="14.0" r="5" fill="transparent"><title>09-12: $862</title></circle><circle cx="106.2" cy="14.0" r="5" fill="transparent"><title>09-13: $862</title></circle><circle cx="111.9" cy="14.0" r="5" fill="transparent"><title>09-14: $862</title></circle><circle cx="117.6" cy="14.0" r="5" fill="transparent"><title>09-15: $862</title></circle><circle cx="123.3" cy="14.0" r="5" fill="transparent"><title>09-16: $862</title></circle><circle cx="129.0" cy="14.0" r="5" fill="transparent"><title>09-17: $862</title></circle><circle cx="134.6" cy="36.0" r="5" fill="transparent"><title>09-18: $753</title></circle><circle cx="140.3" cy="36.0" r="5" fill="transparent"><title>09-19: $753</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $753</title></circle></svg><span class="lownote">low $753</span></div>
+    <header><h3>A3</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$753</span><span class="permo">/mo</span> </p>
+    <p class="meta">651 sqft · 1 bed · <span class="psf">$1.16/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="753" data-avail="2026-11-07"><span class="u">#1.2011</span><span class="p">$753</span><span class="d">Nov 7</span><span class="s">$1.16</span></li><li class="unit-row" data-price="763" data-avail="2026-10-17"><span class="u">#1.1087</span><span class="p">$763</span><span class="d">Oct 17</span><span class="s">$1.17</span></li><li class="unit-row" data-price="818" data-avail="2026-10-31"><span class="u">#1.1159</span><span class="p">$818</span><span class="d">Oct 31</span><span class="s">$1.26</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $753</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="758" data-sqft="651" data-psf="1.164">
+<article class="card" style="--series:var(--series-davenport)" data-price="758" data-sqft="651" data-psf="1.164" data-basefrom="758">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a4" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3710347_3-224-5_2d_web.jpg" alt="A4 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A4</h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$758<span class="permo">/mo</span> </p>
-    <p class="meta">651 sqft · 1 bed · 2 homes left · <span class="psf">$1.16/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $758 to $867"><polyline points="4.0,12.0 9.1,12.0 14.1,12.0 19.2,12.0 24.3,12.0 29.4,12.0 34.4,12.0 39.5,12.0 44.6,12.0 49.6,12.0 54.7,12.0 59.8,12.0 64.9,12.0 69.9,12.0 75.0,12.0 80.1,12.0 85.1,12.0 90.2,12.0 95.3,12.0 100.4,12.0 105.4,12.0 110.5,12.0 115.6,12.0 120.6,12.0 125.7,12.0 130.8,12.0 135.9,36.0 140.9,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>08-23: $867</title></circle><circle cx="9.1" cy="12.0" r="5" fill="transparent"><title>08-24: $867</title></circle><circle cx="14.1" cy="12.0" r="5" fill="transparent"><title>08-25: $867</title></circle><circle cx="19.2" cy="12.0" r="5" fill="transparent"><title>08-26: $867</title></circle><circle cx="24.3" cy="12.0" r="5" fill="transparent"><title>08-27: $867</title></circle><circle cx="29.4" cy="12.0" r="5" fill="transparent"><title>08-28: $867</title></circle><circle cx="34.4" cy="12.0" r="5" fill="transparent"><title>08-29: $867</title></circle><circle cx="39.5" cy="12.0" r="5" fill="transparent"><title>08-30: $867</title></circle><circle cx="44.6" cy="12.0" r="5" fill="transparent"><title>08-31: $867</title></circle><circle cx="49.6" cy="12.0" r="5" fill="transparent"><title>09-01: $867</title></circle><circle cx="54.7" cy="12.0" r="5" fill="transparent"><title>09-02: $867</title></circle><circle cx="59.8" cy="12.0" r="5" fill="transparent"><title>09-03: $867</title></circle><circle cx="64.9" cy="12.0" r="5" fill="transparent"><title>09-04: $867</title></circle><circle cx="69.9" cy="12.0" r="5" fill="transparent"><title>09-05: $867</title></circle><circle cx="75.0" cy="12.0" r="5" fill="transparent"><title>09-06: $867</title></circle><circle cx="80.1" cy="12.0" r="5" fill="transparent"><title>09-07: $867</title></circle><circle cx="85.1" cy="12.0" r="5" fill="transparent"><title>09-08: $867</title></circle><circle cx="90.2" cy="12.0" r="5" fill="transparent"><title>09-09: $867</title></circle><circle cx="95.3" cy="12.0" r="5" fill="transparent"><title>09-10: $867</title></circle><circle cx="100.4" cy="12.0" r="5" fill="transparent"><title>09-11: $867</title></circle><circle cx="105.4" cy="12.0" r="5" fill="transparent"><title>09-12: $867</title></circle><circle cx="110.5" cy="12.0" r="5" fill="transparent"><title>09-13: $867</title></circle><circle cx="115.6" cy="12.0" r="5" fill="transparent"><title>09-14: $867</title></circle><circle cx="120.6" cy="12.0" r="5" fill="transparent"><title>09-15: $867</title></circle><circle cx="125.7" cy="12.0" r="5" fill="transparent"><title>09-16: $867</title></circle><circle cx="130.8" cy="12.0" r="5" fill="transparent"><title>09-17: $867</title></circle><circle cx="135.9" cy="36.0" r="5" fill="transparent"><title>09-18: $758</title></circle><circle cx="140.9" cy="36.0" r="5" fill="transparent"><title>09-19: $758</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $758</title></circle></svg><span class="lownote">low $758</span></div>
+    <header><h3>A4</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$758</span><span class="permo">/mo</span> </p>
+    <p class="meta">651 sqft · 1 bed · <span class="psf">$1.16/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="758" data-avail="2026-10-10"><span class="u">#1.1039</span><span class="p">$758</span><span class="d">Oct 10</span><span class="s">$1.16</span></li><li class="unit-row" data-price="758" data-avail="2026-10-31"><span class="u">#1.2012</span><span class="p">$758</span><span class="d">Oct 31</span><span class="s">$1.16</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $758</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="841" data-sqft="764" data-psf="1.101">
+<article class="card" style="--series:var(--series-davenport)" data-price="841" data-sqft="764" data-psf="1.101" data-basefrom="841">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a8" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3710347_7-224-5_2d_web.jpg" alt="A8 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A8</h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$841<span class="permo">/mo</span> </p>
-    <p class="meta">764 sqft · 1 bed · 2 homes left · <span class="psf">$1.10/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $841 to $1,185"><polyline points="4.0,12.0 9.1,12.0 14.1,12.0 19.2,12.0 24.3,12.0 29.4,12.0 34.4,12.0 39.5,12.0 44.6,12.0 49.6,19.0 54.7,29.5 59.8,35.7 64.9,35.7 69.9,36.0 75.0,36.0 80.1,36.0 85.1,36.0 90.2,35.7 95.3,35.7 100.4,35.7 105.4,35.7 110.5,35.7 115.6,35.7 120.6,36.0 125.7,36.0 130.8,36.0 135.9,36.0 140.9,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>08-23: $1,185</title></circle><circle cx="9.1" cy="12.0" r="5" fill="transparent"><title>08-24: $1,185</title></circle><circle cx="14.1" cy="12.0" r="5" fill="transparent"><title>08-25: $1,185</title></circle><circle cx="19.2" cy="12.0" r="5" fill="transparent"><title>08-26: $1,185</title></circle><circle cx="24.3" cy="12.0" r="5" fill="transparent"><title>08-27: $1,185</title></circle><circle cx="29.4" cy="12.0" r="5" fill="transparent"><title>08-28: $1,185</title></circle><circle cx="34.4" cy="12.0" r="5" fill="transparent"><title>08-29: $1,185</title></circle><circle cx="39.5" cy="12.0" r="5" fill="transparent"><title>08-30: $1,185</title></circle><circle cx="44.6" cy="12.0" r="5" fill="transparent"><title>08-31: $1,185</title></circle><circle cx="49.6" cy="19.0" r="5" fill="transparent"><title>09-01: $1,085</title></circle><circle cx="54.7" cy="29.5" r="5" fill="transparent"><title>09-02: $934</title></circle><circle cx="59.8" cy="35.7" r="5" fill="transparent"><title>09-03: $846</title></circle><circle cx="64.9" cy="35.7" r="5" fill="transparent"><title>09-04: $846</title></circle><circle cx="69.9" cy="36.0" r="5" fill="transparent"><title>09-05: $841</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-06: $841</title></circle><circle cx="80.1" cy="36.0" r="5" fill="transparent"><title>09-07: $841</title></circle><circle cx="85.1" cy="36.0" r="5" fill="transparent"><title>09-08: $841</title></circle><circle cx="90.2" cy="35.7" r="5" fill="transparent"><title>09-09: $846</title></circle><circle cx="95.3" cy="35.7" r="5" fill="transparent"><title>09-10: $846</title></circle><circle cx="100.4" cy="35.7" r="5" fill="transparent"><title>09-11: $846</title></circle><circle cx="105.4" cy="35.7" r="5" fill="transparent"><title>09-12: $846</title></circle><circle cx="110.5" cy="35.7" r="5" fill="transparent"><title>09-13: $846</title></circle><circle cx="115.6" cy="35.7" r="5" fill="transparent"><title>09-14: $846</title></circle><circle cx="120.6" cy="36.0" r="5" fill="transparent"><title>09-15: $841</title></circle><circle cx="125.7" cy="36.0" r="5" fill="transparent"><title>09-16: $841</title></circle><circle cx="130.8" cy="36.0" r="5" fill="transparent"><title>09-17: $841</title></circle><circle cx="135.9" cy="36.0" r="5" fill="transparent"><title>09-18: $841</title></circle><circle cx="140.9" cy="36.0" r="5" fill="transparent"><title>09-19: $841</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $841</title></circle></svg><span class="lownote">low $841</span></div>
+    <header><h3>A8</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$841</span><span class="permo">/mo</span> </p>
+    <p class="meta">764 sqft · 1 bed · <span class="psf">$1.10/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="841" data-avail=""><span class="u">#1.2202</span><span class="p">$841</span><span class="d nowd">now</span><span class="s">$1.10</span></li><li class="unit-row" data-price="846" data-avail="2026-10-31"><span class="u">#1.2037</span><span class="p">$846</span><span class="d">Oct 31</span><span class="s">$1.11</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $841</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="871" data-sqft="762" data-psf="1.143">
+<article class="card" style="--series:var(--series-davenport)" data-price="871" data-sqft="762" data-psf="1.143" data-basefrom="871">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a5" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3710347_4-224-5_2d_web%20-%20resized.jpg" alt="A5 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A5</h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$871<span class="permo">/mo</span> </p>
-    <p class="meta">762 sqft · 1 bed · 4 homes left · <span class="psf">$1.14/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $871 to $1,062"><polyline points="4.0,12.0 9.1,12.0 14.1,12.0 19.2,12.0 24.3,12.0 29.4,12.0 34.4,12.0 39.5,12.0 44.6,12.0 49.6,24.6 54.7,24.6 59.8,24.6 64.9,24.6 69.9,24.6 75.0,24.6 80.1,24.6 85.1,24.6 90.2,32.6 95.3,32.6 100.4,32.6 105.4,32.6 110.5,32.6 115.6,32.6 120.6,36.0 125.7,36.0 130.8,36.0 135.9,36.0 140.9,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>08-23: $1,062</title></circle><circle cx="9.1" cy="12.0" r="5" fill="transparent"><title>08-24: $1,062</title></circle><circle cx="14.1" cy="12.0" r="5" fill="transparent"><title>08-25: $1,062</title></circle><circle cx="19.2" cy="12.0" r="5" fill="transparent"><title>08-26: $1,062</title></circle><circle cx="24.3" cy="12.0" r="5" fill="transparent"><title>08-27: $1,062</title></circle><circle cx="29.4" cy="12.0" r="5" fill="transparent"><title>08-28: $1,062</title></circle><circle cx="34.4" cy="12.0" r="5" fill="transparent"><title>08-29: $1,062</title></circle><circle cx="39.5" cy="12.0" r="5" fill="transparent"><title>08-30: $1,062</title></circle><circle cx="44.6" cy="12.0" r="5" fill="transparent"><title>08-31: $1,062</title></circle><circle cx="49.6" cy="24.6" r="5" fill="transparent"><title>09-01: $962</title></circle><circle cx="54.7" cy="24.6" r="5" fill="transparent"><title>09-02: $962</title></circle><circle cx="59.8" cy="24.6" r="5" fill="transparent"><title>09-03: $962</title></circle><circle cx="64.9" cy="24.6" r="5" fill="transparent"><title>09-04: $962</title></circle><circle cx="69.9" cy="24.6" r="5" fill="transparent"><title>09-05: $962</title></circle><circle cx="75.0" cy="24.6" r="5" fill="transparent"><title>09-06: $962</title></circle><circle cx="80.1" cy="24.6" r="5" fill="transparent"><title>09-07: $962</title></circle><circle cx="85.1" cy="24.6" r="5" fill="transparent"><title>09-08: $962</title></circle><circle cx="90.2" cy="32.6" r="5" fill="transparent"><title>09-09: $898</title></circle><circle cx="95.3" cy="32.6" r="5" fill="transparent"><title>09-10: $898</title></circle><circle cx="100.4" cy="32.6" r="5" fill="transparent"><title>09-11: $898</title></circle><circle cx="105.4" cy="32.6" r="5" fill="transparent"><title>09-12: $898</title></circle><circle cx="110.5" cy="32.6" r="5" fill="transparent"><title>09-13: $898</title></circle><circle cx="115.6" cy="32.6" r="5" fill="transparent"><title>09-14: $898</title></circle><circle cx="120.6" cy="36.0" r="5" fill="transparent"><title>09-15: $871</title></circle><circle cx="125.7" cy="36.0" r="5" fill="transparent"><title>09-16: $871</title></circle><circle cx="130.8" cy="36.0" r="5" fill="transparent"><title>09-17: $871</title></circle><circle cx="135.9" cy="36.0" r="5" fill="transparent"><title>09-18: $871</title></circle><circle cx="140.9" cy="36.0" r="5" fill="transparent"><title>09-19: $871</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $871</title></circle></svg><span class="lownote">low $871</span></div>
+    <header><h3>A5</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$871</span><span class="permo">/mo</span> </p>
+    <p class="meta">762 sqft · 1 bed · <span class="psf">$1.14/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="871" data-avail="2026-10-03"><span class="u">#2.1136</span><span class="p">$871</span><span class="d">Oct 3</span><span class="s">$1.14</span></li><li class="unit-row" data-price="941" data-avail="2026-10-31"><span class="u">#2.1045</span><span class="p">$941</span><span class="d">Oct 31</span><span class="s">$1.23</span></li><li class="unit-row" data-price="1016" data-avail=""><span class="u">#2.1030</span><span class="p">$1,016</span><span class="d nowd">now</span><span class="s">$1.33</span></li><li class="unit-row" data-price="1021" data-avail="2026-10-31"><span class="u">#2.1027</span><span class="p">$1,021</span><span class="d">Oct 31</span><span class="s">$1.34</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $871</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="876" data-sqft="764" data-psf="1.147">
+<article class="card" style="--series:var(--series-davenport)" data-price="876" data-sqft="764" data-psf="1.147" data-basefrom="876">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a7" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3710347_6-224-5_2d_web.jpg" alt="A7 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A7</h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$876<span class="permo">/mo</span> </p>
-    <p class="meta">764 sqft · 1 bed · 2 homes left · <span class="psf">$1.15/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $876 to $1,145"><polyline points="4.0,12.4 9.1,12.4 14.1,12.4 19.2,12.4 24.3,12.4 29.4,12.0 34.4,12.4 39.5,12.4 44.6,12.4 49.6,21.4 54.7,28.1 59.8,36.0 64.9,36.0 69.9,36.0 75.0,36.0 80.1,36.0 85.1,36.0 90.2,36.0 95.3,36.0 100.4,36.0 105.4,36.0 110.5,36.0 115.6,36.0 120.6,36.0 125.7,36.0 130.8,36.0 135.9,36.0 140.9,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="12.4" r="5" fill="transparent"><title>08-23: $1,140</title></circle><circle cx="9.1" cy="12.4" r="5" fill="transparent"><title>08-24: $1,140</title></circle><circle cx="14.1" cy="12.4" r="5" fill="transparent"><title>08-25: $1,140</title></circle><circle cx="19.2" cy="12.4" r="5" fill="transparent"><title>08-26: $1,140</title></circle><circle cx="24.3" cy="12.4" r="5" fill="transparent"><title>08-27: $1,140</title></circle><circle cx="29.4" cy="12.0" r="5" fill="transparent"><title>08-28: $1,145</title></circle><circle cx="34.4" cy="12.4" r="5" fill="transparent"><title>08-29: $1,140</title></circle><circle cx="39.5" cy="12.4" r="5" fill="transparent"><title>08-30: $1,140</title></circle><circle cx="44.6" cy="12.4" r="5" fill="transparent"><title>08-31: $1,140</title></circle><circle cx="49.6" cy="21.4" r="5" fill="transparent"><title>09-01: $1,040</title></circle><circle cx="54.7" cy="28.1" r="5" fill="transparent"><title>09-02: $964</title></circle><circle cx="59.8" cy="36.0" r="5" fill="transparent"><title>09-03: $876</title></circle><circle cx="64.9" cy="36.0" r="5" fill="transparent"><title>09-04: $876</title></circle><circle cx="69.9" cy="36.0" r="5" fill="transparent"><title>09-05: $876</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-06: $876</title></circle><circle cx="80.1" cy="36.0" r="5" fill="transparent"><title>09-07: $876</title></circle><circle cx="85.1" cy="36.0" r="5" fill="transparent"><title>09-08: $876</title></circle><circle cx="90.2" cy="36.0" r="5" fill="transparent"><title>09-09: $876</title></circle><circle cx="95.3" cy="36.0" r="5" fill="transparent"><title>09-10: $876</title></circle><circle cx="100.4" cy="36.0" r="5" fill="transparent"><title>09-11: $876</title></circle><circle cx="105.4" cy="36.0" r="5" fill="transparent"><title>09-12: $876</title></circle><circle cx="110.5" cy="36.0" r="5" fill="transparent"><title>09-13: $876</title></circle><circle cx="115.6" cy="36.0" r="5" fill="transparent"><title>09-14: $876</title></circle><circle cx="120.6" cy="36.0" r="5" fill="transparent"><title>09-15: $876</title></circle><circle cx="125.7" cy="36.0" r="5" fill="transparent"><title>09-16: $876</title></circle><circle cx="130.8" cy="36.0" r="5" fill="transparent"><title>09-17: $876</title></circle><circle cx="135.9" cy="36.0" r="5" fill="transparent"><title>09-18: $876</title></circle><circle cx="140.9" cy="36.0" r="5" fill="transparent"><title>09-19: $876</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $876</title></circle></svg><span class="lownote">low $876</span></div>
+    <header><h3>A7</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$876</span><span class="permo">/mo</span> </p>
+    <p class="meta">764 sqft · 1 bed · <span class="psf">$1.15/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="876" data-avail=""><span class="u">#1.2210</span><span class="p">$876</span><span class="d nowd">now</span><span class="s">$1.15</span></li><li class="unit-row" data-price="881" data-avail=""><span class="u">#1.2005</span><span class="p">$881</span><span class="d nowd">now</span><span class="s">$1.15</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $876</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="879" data-sqft="1012" data-psf="0.869">
+<article class="card" style="--series:var(--series-davenport)" data-price="879" data-sqft="1012" data-psf="0.869" data-basefrom="879">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a1-%2b-den" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3709699_8-224-5_2d_web%20-%20resized.jpg" alt="A1 + Den floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A1 + Den</h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$879<span class="permo">/mo</span> </p>
-    <p class="meta">1,012 sqft · 1 bed · 1 home left · <span class="psf">$0.87/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $879 to $907"><polyline points="4.0,12.0 32.4,12.0 60.8,12.0 89.2,36.0 117.6,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>09-15: $907</title></circle><circle cx="32.4" cy="12.0" r="5" fill="transparent"><title>09-16: $907</title></circle><circle cx="60.8" cy="12.0" r="5" fill="transparent"><title>09-17: $907</title></circle><circle cx="89.2" cy="36.0" r="5" fill="transparent"><title>09-18: $879</title></circle><circle cx="117.6" cy="36.0" r="5" fill="transparent"><title>09-19: $879</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $879</title></circle></svg><span class="lownote">low $879</span></div>
+    <header><h3>A1 + Den</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$879</span><span class="permo">/mo</span> </p>
+    <p class="meta">1,012 sqft · 1 bed · <span class="psf">$0.87/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="879" data-avail="2026-10-16"><span class="u">#1.1094</span><span class="p">$879</span><span class="d">Oct 16</span><span class="s">$0.87</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $879</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="914" data-sqft="942" data-psf="0.970">
+<article class="card" style="--series:var(--series-davenport)" data-price="914" data-sqft="942" data-psf="0.970" data-basefrom="914">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a12-%2b-den" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3709699_6-224-5_2d_web%20-%20resized.jpg" alt="A12 + Den floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A12 + Den</h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$914<span class="permo">/mo</span> </p>
-    <p class="meta">942 sqft · 1 bed · 1 home left · <span class="psf">$0.97/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $914 to $1,196"><polyline points="4.0,12.0 9.1,12.0 14.1,12.0 19.2,12.0 24.3,12.0 29.4,12.0 34.4,12.0 39.5,12.0 44.6,12.0 49.6,20.5 54.7,26.0 59.8,31.1 64.9,31.1 69.9,31.1 75.0,31.1 80.1,31.1 85.1,31.1 90.2,31.1 95.3,31.1 100.4,31.1 105.4,31.1 110.5,31.1 115.6,31.1 120.6,33.6 125.7,33.6 130.8,33.6 135.9,36.0 140.9,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>08-23: $1,196</title></circle><circle cx="9.1" cy="12.0" r="5" fill="transparent"><title>08-24: $1,196</title></circle><circle cx="14.1" cy="12.0" r="5" fill="transparent"><title>08-25: $1,196</title></circle><circle cx="19.2" cy="12.0" r="5" fill="transparent"><title>08-26: $1,196</title></circle><circle cx="24.3" cy="12.0" r="5" fill="transparent"><title>08-27: $1,196</title></circle><circle cx="29.4" cy="12.0" r="5" fill="transparent"><title>08-28: $1,196</title></circle><circle cx="34.4" cy="12.0" r="5" fill="transparent"><title>08-29: $1,196</title></circle><circle cx="39.5" cy="12.0" r="5" fill="transparent"><title>08-30: $1,196</title></circle><circle cx="44.6" cy="12.0" r="5" fill="transparent"><title>08-31: $1,196</title></circle><circle cx="49.6" cy="20.5" r="5" fill="transparent"><title>09-01: $1,096</title></circle><circle cx="54.7" cy="26.0" r="5" fill="transparent"><title>09-02: $1,031</title></circle><circle cx="59.8" cy="31.1" r="5" fill="transparent"><title>09-03: $971</title></circle><circle cx="64.9" cy="31.1" r="5" fill="transparent"><title>09-04: $971</title></circle><circle cx="69.9" cy="31.1" r="5" fill="transparent"><title>09-05: $971</title></circle><circle cx="75.0" cy="31.1" r="5" fill="transparent"><title>09-06: $971</title></circle><circle cx="80.1" cy="31.1" r="5" fill="transparent"><title>09-07: $971</title></circle><circle cx="85.1" cy="31.1" r="5" fill="transparent"><title>09-08: $971</title></circle><circle cx="90.2" cy="31.1" r="5" fill="transparent"><title>09-09: $971</title></circle><circle cx="95.3" cy="31.1" r="5" fill="transparent"><title>09-10: $971</title></circle><circle cx="100.4" cy="31.1" r="5" fill="transparent"><title>09-11: $971</title></circle><circle cx="105.4" cy="31.1" r="5" fill="transparent"><title>09-12: $971</title></circle><circle cx="110.5" cy="31.1" r="5" fill="transparent"><title>09-13: $971</title></circle><circle cx="115.6" cy="31.1" r="5" fill="transparent"><title>09-14: $971</title></circle><circle cx="120.6" cy="33.6" r="5" fill="transparent"><title>09-15: $942</title></circle><circle cx="125.7" cy="33.6" r="5" fill="transparent"><title>09-16: $942</title></circle><circle cx="130.8" cy="33.6" r="5" fill="transparent"><title>09-17: $942</title></circle><circle cx="135.9" cy="36.0" r="5" fill="transparent"><title>09-18: $914</title></circle><circle cx="140.9" cy="36.0" r="5" fill="transparent"><title>09-19: $914</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $914</title></circle></svg><span class="lownote">low $914</span></div>
+    <header><h3>A12 + Den</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$914</span><span class="permo">/mo</span> </p>
+    <p class="meta">942 sqft · 1 bed · <span class="psf">$0.97/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="914" data-avail=""><span class="u">#2.1044</span><span class="p">$914</span><span class="d nowd">now</span><span class="s">$0.97</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $914</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="925" data-sqft="803" data-psf="1.152">
+<article class="card" style="--series:var(--series-davenport)" data-price="925" data-sqft="803" data-psf="1.152" data-basefrom="925">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a9" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3710347_8-224-5_2d_web.jpg" alt="A9 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
     <header><h3>A9</h3></header>
-    <p class="price">$925<span class="permo">/mo</span> </p>
-    <p class="meta">803 sqft · 1 bed · 3 homes left · <span class="psf">$1.15/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $913 to $1,062"><polyline points="4.0,12.0 9.1,12.0 14.1,12.0 19.2,12.0 24.3,12.0 29.4,12.0 34.4,12.0 39.5,12.0 44.6,12.0 49.6,36.0 54.7,36.0 59.8,36.0 64.9,36.0 69.9,36.0 75.0,36.0 80.1,36.0 85.1,35.5 90.2,35.5 95.3,35.5 100.4,35.5 105.4,34.1 110.5,34.1 115.6,34.1 120.6,34.1 125.7,34.1 130.8,34.1 135.9,34.1 140.9,34.1 146.0,34.1" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="34.1" r="3" fill="var(--series-davenport)"/><text x="4" y="39" class="spark-min">$913</text><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>08-23: $1,062</title></circle><circle cx="9.1" cy="12.0" r="5" fill="transparent"><title>08-24: $1,062</title></circle><circle cx="14.1" cy="12.0" r="5" fill="transparent"><title>08-25: $1,062</title></circle><circle cx="19.2" cy="12.0" r="5" fill="transparent"><title>08-26: $1,062</title></circle><circle cx="24.3" cy="12.0" r="5" fill="transparent"><title>08-27: $1,062</title></circle><circle cx="29.4" cy="12.0" r="5" fill="transparent"><title>08-28: $1,062</title></circle><circle cx="34.4" cy="12.0" r="5" fill="transparent"><title>08-29: $1,062</title></circle><circle cx="39.5" cy="12.0" r="5" fill="transparent"><title>08-30: $1,062</title></circle><circle cx="44.6" cy="12.0" r="5" fill="transparent"><title>08-31: $1,062</title></circle><circle cx="49.6" cy="36.0" r="5" fill="transparent"><title>09-01: $913</title></circle><circle cx="54.7" cy="36.0" r="5" fill="transparent"><title>09-02: $913</title></circle><circle cx="59.8" cy="36.0" r="5" fill="transparent"><title>09-03: $913</title></circle><circle cx="64.9" cy="36.0" r="5" fill="transparent"><title>09-04: $913</title></circle><circle cx="69.9" cy="36.0" r="5" fill="transparent"><title>09-05: $913</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-06: $913</title></circle><circle cx="80.1" cy="36.0" r="5" fill="transparent"><title>09-07: $913</title></circle><circle cx="85.1" cy="35.5" r="5" fill="transparent"><title>09-08: $916</title></circle><circle cx="90.2" cy="35.5" r="5" fill="transparent"><title>09-09: $916</title></circle><circle cx="95.3" cy="35.5" r="5" fill="transparent"><title>09-10: $916</title></circle><circle cx="100.4" cy="35.5" r="5" fill="transparent"><title>09-11: $916</title></circle><circle cx="105.4" cy="34.1" r="5" fill="transparent"><title>09-12: $925</title></circle><circle cx="110.5" cy="34.1" r="5" fill="transparent"><title>09-13: $925</title></circle><circle cx="115.6" cy="34.1" r="5" fill="transparent"><title>09-14: $925</title></circle><circle cx="120.6" cy="34.1" r="5" fill="transparent"><title>09-15: $925</title></circle><circle cx="125.7" cy="34.1" r="5" fill="transparent"><title>09-16: $925</title></circle><circle cx="130.8" cy="34.1" r="5" fill="transparent"><title>09-17: $925</title></circle><circle cx="135.9" cy="34.1" r="5" fill="transparent"><title>09-18: $925</title></circle><circle cx="140.9" cy="34.1" r="5" fill="transparent"><title>09-19: $925</title></circle><circle cx="146.0" cy="34.1" r="5" fill="transparent"><title>09-20: $925</title></circle></svg><span class="lownote">low $913</span></div>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$925</span><span class="permo">/mo</span> </p>
+    <p class="meta">803 sqft · 1 bed · <span class="psf">$1.15/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="925" data-avail="2026-10-16"><span class="u">#1.0113</span><span class="p">$925</span><span class="d">Oct 16</span><span class="s">$1.15</span></li><li class="unit-row" data-price="930" data-avail="2026-10-14"><span class="u">#1.0208</span><span class="p">$930</span><span class="d">Oct 14</span><span class="s">$1.16</span></li><li class="unit-row" data-price="930" data-avail="2026-10-31"><span class="u">#1.0214</span><span class="p">$930</span><span class="d">Oct 31</span><span class="s">$1.16</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $925</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="950" data-sqft="805" data-psf="1.180">
+<article class="card" style="--series:var(--series-davenport)" data-price="950" data-sqft="805" data-psf="1.180" data-basefrom="950">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a10" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3710347_1-224-5_2d_web.jpg" alt="A10 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
     <header><h3>A10</h3></header>
-    <p class="price">$950<span class="permo">/mo</span> </p>
-    <p class="meta">805 sqft · 1 bed · 4 homes left · <span class="psf">$1.18/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $938 to $1,087"><polyline points="4.0,12.0 9.1,12.0 14.1,12.0 19.2,12.0 24.3,12.0 29.4,12.0 34.4,12.0 39.5,12.0 44.6,12.0 49.6,36.0 54.7,36.0 59.8,36.0 64.9,36.0 69.9,36.0 75.0,36.0 80.1,36.0 85.1,35.5 90.2,35.5 95.3,35.5 100.4,35.5 105.4,34.1 110.5,34.1 115.6,34.1 120.6,34.1 125.7,34.1 130.8,34.1 135.9,34.1 140.9,34.1 146.0,34.1" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="34.1" r="3" fill="var(--series-davenport)"/><text x="4" y="39" class="spark-min">$938</text><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>08-23: $1,087</title></circle><circle cx="9.1" cy="12.0" r="5" fill="transparent"><title>08-24: $1,087</title></circle><circle cx="14.1" cy="12.0" r="5" fill="transparent"><title>08-25: $1,087</title></circle><circle cx="19.2" cy="12.0" r="5" fill="transparent"><title>08-26: $1,087</title></circle><circle cx="24.3" cy="12.0" r="5" fill="transparent"><title>08-27: $1,087</title></circle><circle cx="29.4" cy="12.0" r="5" fill="transparent"><title>08-28: $1,087</title></circle><circle cx="34.4" cy="12.0" r="5" fill="transparent"><title>08-29: $1,087</title></circle><circle cx="39.5" cy="12.0" r="5" fill="transparent"><title>08-30: $1,087</title></circle><circle cx="44.6" cy="12.0" r="5" fill="transparent"><title>08-31: $1,087</title></circle><circle cx="49.6" cy="36.0" r="5" fill="transparent"><title>09-01: $938</title></circle><circle cx="54.7" cy="36.0" r="5" fill="transparent"><title>09-02: $938</title></circle><circle cx="59.8" cy="36.0" r="5" fill="transparent"><title>09-03: $938</title></circle><circle cx="64.9" cy="36.0" r="5" fill="transparent"><title>09-04: $938</title></circle><circle cx="69.9" cy="36.0" r="5" fill="transparent"><title>09-05: $938</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-06: $938</title></circle><circle cx="80.1" cy="36.0" r="5" fill="transparent"><title>09-07: $938</title></circle><circle cx="85.1" cy="35.5" r="5" fill="transparent"><title>09-08: $941</title></circle><circle cx="90.2" cy="35.5" r="5" fill="transparent"><title>09-09: $941</title></circle><circle cx="95.3" cy="35.5" r="5" fill="transparent"><title>09-10: $941</title></circle><circle cx="100.4" cy="35.5" r="5" fill="transparent"><title>09-11: $941</title></circle><circle cx="105.4" cy="34.1" r="5" fill="transparent"><title>09-12: $950</title></circle><circle cx="110.5" cy="34.1" r="5" fill="transparent"><title>09-13: $950</title></circle><circle cx="115.6" cy="34.1" r="5" fill="transparent"><title>09-14: $950</title></circle><circle cx="120.6" cy="34.1" r="5" fill="transparent"><title>09-15: $950</title></circle><circle cx="125.7" cy="34.1" r="5" fill="transparent"><title>09-16: $950</title></circle><circle cx="130.8" cy="34.1" r="5" fill="transparent"><title>09-17: $950</title></circle><circle cx="135.9" cy="34.1" r="5" fill="transparent"><title>09-18: $950</title></circle><circle cx="140.9" cy="34.1" r="5" fill="transparent"><title>09-19: $950</title></circle><circle cx="146.0" cy="34.1" r="5" fill="transparent"><title>09-20: $950</title></circle></svg><span class="lownote">low $938</span></div>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$950</span><span class="permo">/mo</span> </p>
+    <p class="meta">805 sqft · 1 bed · <span class="psf">$1.18/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="950" data-avail=""><span class="u">#2.2072</span><span class="p">$950</span><span class="d nowd">now</span><span class="s">$1.18</span></li><li class="unit-row" data-price="950" data-avail="2026-10-10"><span class="u">#2.1105</span><span class="p">$950</span><span class="d">Oct 10</span><span class="s">$1.18</span></li><li class="unit-row" data-price="950" data-avail="2026-11-07"><span class="u">#2.1072</span><span class="p">$950</span><span class="d">Nov 7</span><span class="s">$1.18</span></li><li class="unit-row" data-price="960" data-avail="2026-10-16"><span class="u">#2.1108</span><span class="p">$960</span><span class="d">Oct 16</span><span class="s">$1.19</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $950</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="1005" data-sqft="992" data-psf="1.013">
+<article class="card" style="--series:var(--series-davenport)" data-price="1005" data-sqft="992" data-psf="1.013" data-basefrom="1005">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a14" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3709699_7-224-5_2d_web%20-%20resized.jpg" alt="A14 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A14</h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$1,005<span class="permo">/mo</span> </p>
-    <p class="meta">992 sqft · 1 bed · 1 home left · <span class="psf">$1.01/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,005 to $1,187"><polyline points="4.0,12.0 11.5,20.6 18.9,28.5 26.4,28.5 33.9,28.5 41.4,28.5 48.8,28.5 56.3,28.5 63.8,28.5 71.3,28.5 78.7,28.5 86.2,28.5 93.7,28.5 101.2,28.5 108.6,32.3 116.1,32.3 123.6,32.3 131.1,36.0 138.5,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>09-01: $1,187</title></circle><circle cx="11.5" cy="20.6" r="5" fill="transparent"><title>09-02: $1,122</title></circle><circle cx="18.9" cy="28.5" r="5" fill="transparent"><title>09-03: $1,062</title></circle><circle cx="26.4" cy="28.5" r="5" fill="transparent"><title>09-04: $1,062</title></circle><circle cx="33.9" cy="28.5" r="5" fill="transparent"><title>09-05: $1,062</title></circle><circle cx="41.4" cy="28.5" r="5" fill="transparent"><title>09-06: $1,062</title></circle><circle cx="48.8" cy="28.5" r="5" fill="transparent"><title>09-07: $1,062</title></circle><circle cx="56.3" cy="28.5" r="5" fill="transparent"><title>09-08: $1,062</title></circle><circle cx="63.8" cy="28.5" r="5" fill="transparent"><title>09-09: $1,062</title></circle><circle cx="71.3" cy="28.5" r="5" fill="transparent"><title>09-10: $1,062</title></circle><circle cx="78.7" cy="28.5" r="5" fill="transparent"><title>09-11: $1,062</title></circle><circle cx="86.2" cy="28.5" r="5" fill="transparent"><title>09-12: $1,062</title></circle><circle cx="93.7" cy="28.5" r="5" fill="transparent"><title>09-13: $1,062</title></circle><circle cx="101.2" cy="28.5" r="5" fill="transparent"><title>09-14: $1,062</title></circle><circle cx="108.6" cy="32.3" r="5" fill="transparent"><title>09-15: $1,033</title></circle><circle cx="116.1" cy="32.3" r="5" fill="transparent"><title>09-16: $1,033</title></circle><circle cx="123.6" cy="32.3" r="5" fill="transparent"><title>09-17: $1,033</title></circle><circle cx="131.1" cy="36.0" r="5" fill="transparent"><title>09-18: $1,005</title></circle><circle cx="138.5" cy="36.0" r="5" fill="transparent"><title>09-19: $1,005</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $1,005</title></circle></svg><span class="lownote">low $1,005</span></div>
+    <header><h3>A14</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,005</span><span class="permo">/mo</span> </p>
+    <p class="meta">992 sqft · 1 bed · <span class="psf">$1.01/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1005" data-avail=""><span class="u">#1.0407</span><span class="p">$1,005</span><span class="d nowd">now</span><span class="s">$1.01</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $1,005</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="1049" data-sqft="956" data-psf="1.097">
+<article class="card" style="--series:var(--series-davenport)" data-price="1049" data-sqft="956" data-psf="1.097" data-basefrom="1049">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/a13-%2b-den" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3710347_11-224-5_2d_web%20-%20resized.jpg" alt="A13 + Den floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A13 + Den</h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$1,049<span class="permo">/mo</span> </p>
-    <p class="meta">956 sqft · 1 bed · 1 home left · <span class="psf">$1.10/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,049 to $1,106"><polyline points="4.0,12.0 15.8,12.0 27.7,12.0 39.5,12.0 51.3,12.0 63.2,12.0 75.0,12.0 86.8,24.2 98.7,24.2 110.5,24.2 122.3,36.0 134.2,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>09-08: $1,106</title></circle><circle cx="15.8" cy="12.0" r="5" fill="transparent"><title>09-09: $1,106</title></circle><circle cx="27.7" cy="12.0" r="5" fill="transparent"><title>09-10: $1,106</title></circle><circle cx="39.5" cy="12.0" r="5" fill="transparent"><title>09-11: $1,106</title></circle><circle cx="51.3" cy="12.0" r="5" fill="transparent"><title>09-12: $1,106</title></circle><circle cx="63.2" cy="12.0" r="5" fill="transparent"><title>09-13: $1,106</title></circle><circle cx="75.0" cy="12.0" r="5" fill="transparent"><title>09-14: $1,106</title></circle><circle cx="86.8" cy="24.2" r="5" fill="transparent"><title>09-15: $1,077</title></circle><circle cx="98.7" cy="24.2" r="5" fill="transparent"><title>09-16: $1,077</title></circle><circle cx="110.5" cy="24.2" r="5" fill="transparent"><title>09-17: $1,077</title></circle><circle cx="122.3" cy="36.0" r="5" fill="transparent"><title>09-18: $1,049</title></circle><circle cx="134.2" cy="36.0" r="5" fill="transparent"><title>09-19: $1,049</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $1,049</title></circle></svg><span class="lownote">low $1,049</span></div>
+    <header><h3>A13 + Den</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,049</span><span class="permo">/mo</span> </p>
+    <p class="meta">956 sqft · 1 bed · <span class="psf">$1.10/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1049" data-avail="2026-11-07"><span class="u">#2.1026</span><span class="p">$1,049</span><span class="d">Nov 7</span><span class="s">$1.10</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $1,049</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="1119" data-sqft="1143" data-psf="0.979">
+<article class="card" style="--series:var(--series-davenport)" data-price="1119" data-sqft="1143" data-psf="0.979" data-basefrom="1119">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/b3" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3709699_9-224-5_2d_web%20-%20resized.jpg" alt="B3 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
     <header><h3>B3</h3></header>
-    <p class="price">$1,119<span class="permo">/mo</span> </p>
-    <p class="meta">1,143 sqft · 2 bed · 2 homes left · <span class="psf">$0.98/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,109 to $1,119"><polyline points="4.0,36.0 13.5,36.0 22.9,36.0 32.4,36.0 41.9,36.0 51.3,36.0 60.8,36.0 70.3,36.0 79.7,36.0 89.2,12.0 98.7,12.0 108.1,12.0 117.6,12.0 127.1,12.0 136.5,12.0 146.0,12.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="12.0" r="3" fill="var(--series-davenport)"/><text x="4" y="39" class="spark-min">$1,109</text><circle cx="4.0" cy="36.0" r="5" fill="transparent"><title>09-05: $1,109</title></circle><circle cx="13.5" cy="36.0" r="5" fill="transparent"><title>09-06: $1,109</title></circle><circle cx="22.9" cy="36.0" r="5" fill="transparent"><title>09-07: $1,109</title></circle><circle cx="32.4" cy="36.0" r="5" fill="transparent"><title>09-08: $1,109</title></circle><circle cx="41.9" cy="36.0" r="5" fill="transparent"><title>09-09: $1,109</title></circle><circle cx="51.3" cy="36.0" r="5" fill="transparent"><title>09-10: $1,109</title></circle><circle cx="60.8" cy="36.0" r="5" fill="transparent"><title>09-11: $1,109</title></circle><circle cx="70.3" cy="36.0" r="5" fill="transparent"><title>09-12: $1,109</title></circle><circle cx="79.7" cy="36.0" r="5" fill="transparent"><title>09-13: $1,109</title></circle><circle cx="89.2" cy="12.0" r="5" fill="transparent"><title>09-14: $1,119</title></circle><circle cx="98.7" cy="12.0" r="5" fill="transparent"><title>09-15: $1,119</title></circle><circle cx="108.1" cy="12.0" r="5" fill="transparent"><title>09-16: $1,119</title></circle><circle cx="117.6" cy="12.0" r="5" fill="transparent"><title>09-17: $1,119</title></circle><circle cx="127.1" cy="12.0" r="5" fill="transparent"><title>09-18: $1,119</title></circle><circle cx="136.5" cy="12.0" r="5" fill="transparent"><title>09-19: $1,119</title></circle><circle cx="146.0" cy="12.0" r="5" fill="transparent"><title>09-20: $1,119</title></circle></svg><span class="lownote">low $1,109</span></div>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,119</span><span class="permo">/mo</span> </p>
+    <p class="meta">1,143 sqft · 2 bed · <span class="psf">$0.98/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1119" data-avail="2026-09-25"><span class="u">#1.1171</span><span class="p">$1,119</span><span class="d">Sep 25</span><span class="s">$0.98</span></li><li class="unit-row" data-price="1119" data-avail="2026-09-30"><span class="u">#1.1083</span><span class="p">$1,119</span><span class="d">Sep 30</span><span class="s">$0.98</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $1,119</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-davenport)" data-price="1159" data-sqft="1160" data-psf="0.999">
+<article class="card" style="--series:var(--series-davenport)" data-price="1159" data-sqft="1160" data-psf="0.999" data-basefrom="1159">
   <a class="fig" href="https://www.davenport-apts.com/floorplans/b4" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3709699_10-224-5_2d_web%20-%20resized.jpg" alt="B4 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
     <header><h3>B4</h3></header>
-    <p class="price">$1,159<span class="permo">/mo</span> </p>
-    <p class="meta">1,160 sqft · 2 bed · 1 home left · <span class="psf">$1.00/ft²</span></p>
-    <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,159 to $1,159"><polyline points="4.0,36.0 13.5,36.0 22.9,36.0 32.4,36.0 41.9,36.0 51.3,36.0 60.8,36.0 70.3,36.0 79.7,36.0 89.2,36.0 98.7,36.0 108.1,36.0 117.6,36.0 127.1,36.0 136.5,36.0 146.0,36.0" fill="none" stroke="var(--series-davenport)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-davenport)"/><circle cx="4.0" cy="36.0" r="5" fill="transparent"><title>09-05: $1,159</title></circle><circle cx="13.5" cy="36.0" r="5" fill="transparent"><title>09-06: $1,159</title></circle><circle cx="22.9" cy="36.0" r="5" fill="transparent"><title>09-07: $1,159</title></circle><circle cx="32.4" cy="36.0" r="5" fill="transparent"><title>09-08: $1,159</title></circle><circle cx="41.9" cy="36.0" r="5" fill="transparent"><title>09-09: $1,159</title></circle><circle cx="51.3" cy="36.0" r="5" fill="transparent"><title>09-10: $1,159</title></circle><circle cx="60.8" cy="36.0" r="5" fill="transparent"><title>09-11: $1,159</title></circle><circle cx="70.3" cy="36.0" r="5" fill="transparent"><title>09-12: $1,159</title></circle><circle cx="79.7" cy="36.0" r="5" fill="transparent"><title>09-13: $1,159</title></circle><circle cx="89.2" cy="36.0" r="5" fill="transparent"><title>09-14: $1,159</title></circle><circle cx="98.7" cy="36.0" r="5" fill="transparent"><title>09-15: $1,159</title></circle><circle cx="108.1" cy="36.0" r="5" fill="transparent"><title>09-16: $1,159</title></circle><circle cx="117.6" cy="36.0" r="5" fill="transparent"><title>09-17: $1,159</title></circle><circle cx="127.1" cy="36.0" r="5" fill="transparent"><title>09-18: $1,159</title></circle><circle cx="136.5" cy="36.0" r="5" fill="transparent"><title>09-19: $1,159</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $1,159</title></circle></svg><span class="lownote">low $1,159</span></div>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,159</span><span class="permo">/mo</span> </p>
+    <p class="meta">1,160 sqft · 2 bed · <span class="psf">$1.00/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1159" data-avail=""><span class="u">#2.1120</span><span class="p">$1,159</span><span class="d nowd">now</span><span class="s">$1.00</span></li></ul>
+    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $1,159</span></div>
   </div>
 </article></div>
+  <p class="nomatch" hidden>No homes here match the current filters.</p>
   <details class="tableview"><summary>table view</summary>
-    <table><thead><tr><th>plan</th><th>rent</th><th>sqft</th><th>$/sqft</th><th>beds</th><th>availability</th><th>all-time low</th></tr></thead>
-    <tbody><tr data-price="753" data-sqft="651" data-psf="1.157"><td>A3</td><td>$753</td><td>651</td><td>$1.16</td><td>1</td><td>3 left</td><td>$753</td></tr><tr data-price="758" data-sqft="651" data-psf="1.164"><td>A4</td><td>$758</td><td>651</td><td>$1.16</td><td>1</td><td>2 left</td><td>$758</td></tr><tr data-price="841" data-sqft="764" data-psf="1.101"><td>A8</td><td>$841</td><td>764</td><td>$1.10</td><td>1</td><td>2 left</td><td>$841</td></tr><tr data-price="871" data-sqft="762" data-psf="1.143"><td>A5</td><td>$871</td><td>762</td><td>$1.14</td><td>1</td><td>4 left</td><td>$871</td></tr><tr data-price="876" data-sqft="764" data-psf="1.147"><td>A7</td><td>$876</td><td>764</td><td>$1.15</td><td>1</td><td>2 left</td><td>$876</td></tr><tr data-price="879" data-sqft="1012" data-psf="0.869"><td>A1 + Den</td><td>$879</td><td>1,012</td><td>$0.87</td><td>1</td><td>1 left</td><td>$879</td></tr><tr data-price="914" data-sqft="942" data-psf="0.970"><td>A12 + Den</td><td>$914</td><td>942</td><td>$0.97</td><td>1</td><td>1 left</td><td>$914</td></tr><tr data-price="925" data-sqft="803" data-psf="1.152"><td>A9</td><td>$925</td><td>803</td><td>$1.15</td><td>1</td><td>3 left</td><td>$913</td></tr><tr data-price="950" data-sqft="805" data-psf="1.180"><td>A10</td><td>$950</td><td>805</td><td>$1.18</td><td>1</td><td>4 left</td><td>$938</td></tr><tr data-price="1005" data-sqft="992" data-psf="1.013"><td>A14</td><td>$1,005</td><td>992</td><td>$1.01</td><td>1</td><td>1 left</td><td>$1,005</td></tr><tr data-price="1049" data-sqft="956" data-psf="1.097"><td>A13 + Den</td><td>$1,049</td><td>956</td><td>$1.10</td><td>1</td><td>1 left</td><td>$1,049</td></tr><tr data-price="1119" data-sqft="1143" data-psf="0.979"><td>B3</td><td>$1,119</td><td>1,143</td><td>$0.98</td><td>2</td><td>2 left</td><td>$1,109</td></tr><tr data-price="1159" data-sqft="1160" data-psf="0.999"><td>B4</td><td>$1,159</td><td>1,160</td><td>$1.00</td><td>2</td><td>1 left</td><td>$1,159</td></tr></tbody></table>
+    <table><thead><tr><th>plan</th><th>rent</th><th>sqft</th><th>$/sqft</th><th>beds</th><th>available</th><th>all-time low</th></tr></thead>
+    <tbody><tr data-price="753" data-sqft="651" data-psf="1.157" data-avail="2026-11-07"><td>A3 #1.2011</td><td>$753</td><td>651</td><td>$1.16</td><td>1</td><td>Nov 7</td><td>$753</td></tr><tr data-price="763" data-sqft="651" data-psf="1.172" data-avail="2026-10-17"><td>A3 #1.1087</td><td>$763</td><td>651</td><td>$1.17</td><td>1</td><td>Oct 17</td><td>$763</td></tr><tr data-price="818" data-sqft="651" data-psf="1.257" data-avail="2026-10-31"><td>A3 #1.1159</td><td>$818</td><td>651</td><td>$1.26</td><td>1</td><td>Oct 31</td><td>$818</td></tr><tr data-price="758" data-sqft="651" data-psf="1.164" data-avail="2026-10-10"><td>A4 #1.1039</td><td>$758</td><td>651</td><td>$1.16</td><td>1</td><td>Oct 10</td><td>$758</td></tr><tr data-price="758" data-sqft="651" data-psf="1.164" data-avail="2026-10-31"><td>A4 #1.2012</td><td>$758</td><td>651</td><td>$1.16</td><td>1</td><td>Oct 31</td><td>$758</td></tr><tr data-price="841" data-sqft="764" data-psf="1.101" data-avail=""><td>A8 #1.2202</td><td>$841</td><td>764</td><td>$1.10</td><td>1</td><td>now</td><td>$841</td></tr><tr data-price="846" data-sqft="764" data-psf="1.107" data-avail="2026-10-31"><td>A8 #1.2037</td><td>$846</td><td>764</td><td>$1.11</td><td>1</td><td>Oct 31</td><td>$846</td></tr><tr data-price="871" data-sqft="762" data-psf="1.143" data-avail="2026-10-03"><td>A5 #2.1136</td><td>$871</td><td>762</td><td>$1.14</td><td>1</td><td>Oct 3</td><td>$871</td></tr><tr data-price="941" data-sqft="762" data-psf="1.235" data-avail="2026-10-31"><td>A5 #2.1045</td><td>$941</td><td>762</td><td>$1.23</td><td>1</td><td>Oct 31</td><td>$941</td></tr><tr data-price="1016" data-sqft="762" data-psf="1.333" data-avail=""><td>A5 #2.1030</td><td>$1,016</td><td>762</td><td>$1.33</td><td>1</td><td>now</td><td>$1,016</td></tr><tr data-price="1021" data-sqft="762" data-psf="1.340" data-avail="2026-10-31"><td>A5 #2.1027</td><td>$1,021</td><td>762</td><td>$1.34</td><td>1</td><td>Oct 31</td><td>$1,021</td></tr><tr data-price="876" data-sqft="764" data-psf="1.147" data-avail=""><td>A7 #1.2210</td><td>$876</td><td>764</td><td>$1.15</td><td>1</td><td>now</td><td>$876</td></tr><tr data-price="881" data-sqft="764" data-psf="1.153" data-avail=""><td>A7 #1.2005</td><td>$881</td><td>764</td><td>$1.15</td><td>1</td><td>now</td><td>$881</td></tr><tr data-price="879" data-sqft="1012" data-psf="0.869" data-avail="2026-10-16"><td>A1 + Den #1.1094</td><td>$879</td><td>1,012</td><td>$0.87</td><td>1</td><td>Oct 16</td><td>$879</td></tr><tr data-price="914" data-sqft="942" data-psf="0.970" data-avail=""><td>A12 + Den #2.1044</td><td>$914</td><td>942</td><td>$0.97</td><td>1</td><td>now</td><td>$914</td></tr><tr data-price="925" data-sqft="803" data-psf="1.152" data-avail="2026-10-16"><td>A9 #1.0113</td><td>$925</td><td>803</td><td>$1.15</td><td>1</td><td>Oct 16</td><td>$925</td></tr><tr data-price="930" data-sqft="803" data-psf="1.158" data-avail="2026-10-14"><td>A9 #1.0208</td><td>$930</td><td>803</td><td>$1.16</td><td>1</td><td>Oct 14</td><td>$930</td></tr><tr data-price="930" data-sqft="803" data-psf="1.158" data-avail="2026-10-31"><td>A9 #1.0214</td><td>$930</td><td>803</td><td>$1.16</td><td>1</td><td>Oct 31</td><td>$930</td></tr><tr data-price="950" data-sqft="805" data-psf="1.180" data-avail=""><td>A10 #2.2072</td><td>$950</td><td>805</td><td>$1.18</td><td>1</td><td>now</td><td>$950</td></tr><tr data-price="950" data-sqft="805" data-psf="1.180" data-avail="2026-10-10"><td>A10 #2.1105</td><td>$950</td><td>805</td><td>$1.18</td><td>1</td><td>Oct 10</td><td>$950</td></tr><tr data-price="950" data-sqft="805" data-psf="1.180" data-avail="2026-11-07"><td>A10 #2.1072</td><td>$950</td><td>805</td><td>$1.18</td><td>1</td><td>Nov 7</td><td>$950</td></tr><tr data-price="960" data-sqft="805" data-psf="1.193" data-avail="2026-10-16"><td>A10 #2.1108</td><td>$960</td><td>805</td><td>$1.19</td><td>1</td><td>Oct 16</td><td>$960</td></tr><tr data-price="1005" data-sqft="992" data-psf="1.013" data-avail=""><td>A14 #1.0407</td><td>$1,005</td><td>992</td><td>$1.01</td><td>1</td><td>now</td><td>$1,005</td></tr><tr data-price="1049" data-sqft="956" data-psf="1.097" data-avail="2026-11-07"><td>A13 + Den #2.1026</td><td>$1,049</td><td>956</td><td>$1.10</td><td>1</td><td>Nov 7</td><td>$1,049</td></tr><tr data-price="1119" data-sqft="1143" data-psf="0.979" data-avail="2026-09-25"><td>B3 #1.1171</td><td>$1,119</td><td>1,143</td><td>$0.98</td><td>2</td><td>Sep 25</td><td>$1,119</td></tr><tr data-price="1119" data-sqft="1143" data-psf="0.979" data-avail="2026-09-30"><td>B3 #1.1083</td><td>$1,119</td><td>1,143</td><td>$0.98</td><td>2</td><td>Sep 30</td><td>$1,119</td></tr><tr data-price="1159" data-sqft="1160" data-psf="0.999" data-avail=""><td>B4 #2.1120</td><td>$1,159</td><td>1,160</td><td>$1.00</td><td>2</td><td>now</td><td>$1,159</td></tr></tbody></table>
   </details>
 </section>
 <section class="property" id="verlaine" style="--series:var(--series-verlaine)">
   <h2><span class="dot" aria-hidden="true"></span>Verlaine on the Parkway
-    <span class="sub">7 homes · from $925</span>
+    <span class="sub"><span class="cnt">7</span> homes · from <span class="frm">$925</span></span>
     <a class="srclink" href="https://www.verlaineontheparkway.com/dallas/verlaine-on-the-parkway/conventional/" target="_blank" rel="noopener">view on site ↗</a>
   </h2>
-  <div class="grid"><article class="card" style="--series:var(--series-verlaine)" data-price="925" data-sqft="750" data-psf="1.233">
+  <div class="grid"><article class="card" style="--series:var(--series-verlaine)" data-price="925" data-sqft="750" data-psf="1.233" data-basefrom="925">
   <a class="fig" href="https://www.verlaineontheparkway.com/floorplans/dallas-TX/verlaine-on-the-parkway/a4-709702-1/" target="_blank" rel="noopener"><img src="https://medialibrarycfo.entrata.com/102126/MLv3/4/23/2026/07/17/125349/6a5a7a3d431458.29432678539.png" alt="A4 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A4 <span class="unit">1313</span></h3></header>
-    <p class="price">$925<span class="permo">/mo</span> </p>
-    <p class="meta">750 sqft · 1 bed · available now · <span class="psf">$1.23/ft²</span></p>
+    <header><h3>A4</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$925</span><span class="permo">/mo</span> </p>
+    <p class="meta">750 sqft · 1 bed · <span class="psf">$1.23/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="925" data-avail=""><span class="u">1313</span><span class="p">$925</span><span class="d nowd">now</span><span class="s">$1.23</span></li></ul>
     <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $925 to $925"><polyline points="4.0,36.0 15.8,36.0 27.7,36.0 39.5,36.0 51.3,36.0 63.2,36.0 75.0,36.0 86.8,36.0 98.7,36.0 110.5,36.0 122.3,36.0 134.2,36.0 146.0,36.0" fill="none" stroke="var(--series-verlaine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-verlaine)"/><circle cx="4.0" cy="36.0" r="5" fill="transparent"><title>09-08: $925</title></circle><circle cx="15.8" cy="36.0" r="5" fill="transparent"><title>09-09: $925</title></circle><circle cx="27.7" cy="36.0" r="5" fill="transparent"><title>09-10: $925</title></circle><circle cx="39.5" cy="36.0" r="5" fill="transparent"><title>09-11: $925</title></circle><circle cx="51.3" cy="36.0" r="5" fill="transparent"><title>09-12: $925</title></circle><circle cx="63.2" cy="36.0" r="5" fill="transparent"><title>09-13: $925</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-14: $925</title></circle><circle cx="86.8" cy="36.0" r="5" fill="transparent"><title>09-15: $925</title></circle><circle cx="98.7" cy="36.0" r="5" fill="transparent"><title>09-16: $925</title></circle><circle cx="110.5" cy="36.0" r="5" fill="transparent"><title>09-17: $925</title></circle><circle cx="122.3" cy="36.0" r="5" fill="transparent"><title>09-18: $925</title></circle><circle cx="134.2" cy="36.0" r="5" fill="transparent"><title>09-19: $925</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $925</title></circle></svg><span class="lownote">low $925</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-verlaine)" data-price="940" data-sqft="758" data-psf="1.240">
+<article class="card" style="--series:var(--series-verlaine)" data-price="940" data-sqft="758" data-psf="1.240" data-basefrom="940">
   <a class="fig" href="https://www.verlaineontheparkway.com/floorplans/dallas-TX/verlaine-on-the-parkway/a5-709705-1/" target="_blank" rel="noopener"><img src="https://medialibrarycfo.entrata.com/102126/MLv3/4/23/2026/08/07/081558/6a75e89e00b995.51442709233.png" alt="A5 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A5 <span class="unit">2512</span></h3></header>
-    <p class="price">$940<span class="permo">/mo</span> </p>
-    <p class="meta">758 sqft · 1 bed · available now · <span class="psf">$1.24/ft²</span></p>
+    <header><h3>A5</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$940</span><span class="permo">/mo</span> </p>
+    <p class="meta">758 sqft · 1 bed · <span class="psf">$1.24/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="940" data-avail=""><span class="u">2512</span><span class="p">$940</span><span class="d nowd">now</span><span class="s">$1.24</span></li></ul>
     <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $940 to $940"><polyline points="4.0,36.0 39.5,36.0 75.0,36.0 110.5,36.0 146.0,36.0" fill="none" stroke="var(--series-verlaine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-verlaine)"/><circle cx="4.0" cy="36.0" r="5" fill="transparent"><title>09-16: $940</title></circle><circle cx="39.5" cy="36.0" r="5" fill="transparent"><title>09-17: $940</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-18: $940</title></circle><circle cx="110.5" cy="36.0" r="5" fill="transparent"><title>09-19: $940</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $940</title></circle></svg><span class="lownote">low $940</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-verlaine)" data-price="1050" data-sqft="900" data-psf="1.167">
+<article class="card" style="--series:var(--series-verlaine)" data-price="1050" data-sqft="900" data-psf="1.167" data-basefrom="1050">
   <a class="fig" href="https://www.verlaineontheparkway.com/floorplans/dallas-TX/verlaine-on-the-parkway/a7-709698-1/" target="_blank" rel="noopener"><img src="https://medialibrarycfo.entrata.com/102126/MLv3/4/23/2026/07/17/125654/6a5a7af69f6e68.23589553821.png" alt="A7 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A7 <span class="unit">0621</span></h3></header>
-    <p class="price">$1,050<span class="permo">/mo</span> </p>
-    <p class="meta">900 sqft · 1 bed · available now · <span class="psf">$1.17/ft²</span></p>
+    <header><h3>A7</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,050</span><span class="permo">/mo</span> </p>
+    <p class="meta">900 sqft · 1 bed · <span class="psf">$1.17/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1050" data-avail=""><span class="u">0621</span><span class="p">$1,050</span><span class="d nowd">now</span><span class="s">$1.17</span></li></ul>
     <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,050 to $1,050"><polyline points="4.0,36.0 15.8,36.0 27.7,36.0 39.5,36.0 51.3,36.0 63.2,36.0 75.0,36.0 86.8,36.0 98.7,36.0 110.5,36.0 122.3,36.0 134.2,36.0 146.0,36.0" fill="none" stroke="var(--series-verlaine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-verlaine)"/><circle cx="4.0" cy="36.0" r="5" fill="transparent"><title>09-08: $1,050</title></circle><circle cx="15.8" cy="36.0" r="5" fill="transparent"><title>09-09: $1,050</title></circle><circle cx="27.7" cy="36.0" r="5" fill="transparent"><title>09-10: $1,050</title></circle><circle cx="39.5" cy="36.0" r="5" fill="transparent"><title>09-11: $1,050</title></circle><circle cx="51.3" cy="36.0" r="5" fill="transparent"><title>09-12: $1,050</title></circle><circle cx="63.2" cy="36.0" r="5" fill="transparent"><title>09-13: $1,050</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-14: $1,050</title></circle><circle cx="86.8" cy="36.0" r="5" fill="transparent"><title>09-15: $1,050</title></circle><circle cx="98.7" cy="36.0" r="5" fill="transparent"><title>09-16: $1,050</title></circle><circle cx="110.5" cy="36.0" r="5" fill="transparent"><title>09-17: $1,050</title></circle><circle cx="122.3" cy="36.0" r="5" fill="transparent"><title>09-18: $1,050</title></circle><circle cx="134.2" cy="36.0" r="5" fill="transparent"><title>09-19: $1,050</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $1,050</title></circle></svg><span class="lownote">low $1,050</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-verlaine)" data-price="1080" data-sqft="720" data-psf="1.500">
+<article class="card" style="--series:var(--series-verlaine)" data-price="1080" data-sqft="720" data-psf="1.500" data-basefrom="1080">
   <a class="fig" href="https://www.verlaineontheparkway.com/floorplans/dallas-TX/verlaine-on-the-parkway/a3r-709710-1/" target="_blank" rel="noopener"><img src="https://medialibrarycfo.entrata.com/102126/MLv3/4/23/2026/07/17/125314/6a5a7a19f1e729.09246681216.png" alt="A3R floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A3R <span class="unit">2015</span></h3></header>
-    <p class="price">$1,080<span class="permo">/mo</span> </p>
-    <p class="meta">720 sqft · 1 bed · available now · <span class="psf">$1.50/ft²</span></p>
+    <header><h3>A3R</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,080</span><span class="permo">/mo</span> </p>
+    <p class="meta">720 sqft · 1 bed · <span class="psf">$1.50/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1080" data-avail=""><span class="u">2015</span><span class="p">$1,080</span><span class="d nowd">now</span><span class="s">$1.50</span></li></ul>
     <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,080 to $1,080"><polyline points="4.0,36.0 15.8,36.0 27.7,36.0 39.5,36.0 51.3,36.0 63.2,36.0 75.0,36.0 86.8,36.0 98.7,36.0 110.5,36.0 122.3,36.0 134.2,36.0 146.0,36.0" fill="none" stroke="var(--series-verlaine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-verlaine)"/><circle cx="4.0" cy="36.0" r="5" fill="transparent"><title>09-08: $1,080</title></circle><circle cx="15.8" cy="36.0" r="5" fill="transparent"><title>09-09: $1,080</title></circle><circle cx="27.7" cy="36.0" r="5" fill="transparent"><title>09-10: $1,080</title></circle><circle cx="39.5" cy="36.0" r="5" fill="transparent"><title>09-11: $1,080</title></circle><circle cx="51.3" cy="36.0" r="5" fill="transparent"><title>09-12: $1,080</title></circle><circle cx="63.2" cy="36.0" r="5" fill="transparent"><title>09-13: $1,080</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-14: $1,080</title></circle><circle cx="86.8" cy="36.0" r="5" fill="transparent"><title>09-15: $1,080</title></circle><circle cx="98.7" cy="36.0" r="5" fill="transparent"><title>09-16: $1,080</title></circle><circle cx="110.5" cy="36.0" r="5" fill="transparent"><title>09-17: $1,080</title></circle><circle cx="122.3" cy="36.0" r="5" fill="transparent"><title>09-18: $1,080</title></circle><circle cx="134.2" cy="36.0" r="5" fill="transparent"><title>09-19: $1,080</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $1,080</title></circle></svg><span class="lownote">low $1,080</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-verlaine)" data-price="1105" data-sqft="750" data-psf="1.473">
+<article class="card" style="--series:var(--series-verlaine)" data-price="1105" data-sqft="750" data-psf="1.473" data-basefrom="1105">
   <a class="fig" href="https://www.verlaineontheparkway.com/floorplans/dallas-TX/verlaine-on-the-parkway/a4r-709703-1/" target="_blank" rel="noopener"><img src="https://medialibrarycfo.entrata.com/102126/MLv3/4/23/2026/07/17/125420/6a5a7a5c96f531.35547315191.png" alt="A4R floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A4R <span class="unit">1305</span></h3></header>
-    <p class="price">$1,105<span class="permo">/mo</span> </p>
-    <p class="meta">750 sqft · 1 bed · available now · <span class="psf">$1.47/ft²</span></p>
+    <header><h3>A4R</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,105</span><span class="permo">/mo</span> </p>
+    <p class="meta">750 sqft · 1 bed · <span class="psf">$1.47/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1105" data-avail=""><span class="u">1305</span><span class="p">$1,105</span><span class="d nowd">now</span><span class="s">$1.47</span></li></ul>
     <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,105 to $1,105"><polyline points="4.0,36.0 15.8,36.0 27.7,36.0 39.5,36.0 51.3,36.0 63.2,36.0 75.0,36.0 86.8,36.0 98.7,36.0 110.5,36.0 122.3,36.0 134.2,36.0 146.0,36.0" fill="none" stroke="var(--series-verlaine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-verlaine)"/><circle cx="4.0" cy="36.0" r="5" fill="transparent"><title>09-08: $1,105</title></circle><circle cx="15.8" cy="36.0" r="5" fill="transparent"><title>09-09: $1,105</title></circle><circle cx="27.7" cy="36.0" r="5" fill="transparent"><title>09-10: $1,105</title></circle><circle cx="39.5" cy="36.0" r="5" fill="transparent"><title>09-11: $1,105</title></circle><circle cx="51.3" cy="36.0" r="5" fill="transparent"><title>09-12: $1,105</title></circle><circle cx="63.2" cy="36.0" r="5" fill="transparent"><title>09-13: $1,105</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-14: $1,105</title></circle><circle cx="86.8" cy="36.0" r="5" fill="transparent"><title>09-15: $1,105</title></circle><circle cx="98.7" cy="36.0" r="5" fill="transparent"><title>09-16: $1,105</title></circle><circle cx="110.5" cy="36.0" r="5" fill="transparent"><title>09-17: $1,105</title></circle><circle cx="122.3" cy="36.0" r="5" fill="transparent"><title>09-18: $1,105</title></circle><circle cx="134.2" cy="36.0" r="5" fill="transparent"><title>09-19: $1,105</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $1,105</title></circle></svg><span class="lownote">low $1,105</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-verlaine)" data-price="1105" data-sqft="758" data-psf="1.458">
+<article class="card" style="--series:var(--series-verlaine)" data-price="1105" data-sqft="758" data-psf="1.458" data-basefrom="1105">
   <a class="fig" href="https://www.verlaineontheparkway.com/floorplans/dallas-TX/verlaine-on-the-parkway/a5r-709706-1/" target="_blank" rel="noopener"><img src="https://medialibrarycfo.entrata.com/102126/MLv3/4/23/2026/08/07/081640/6a75e8c86c2546.30973062629.png" alt="A5R floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A5R <span class="unit">1805</span></h3></header>
-    <p class="price">$1,105<span class="permo">/mo</span> </p>
-    <p class="meta">758 sqft · 1 bed · available now · <span class="psf">$1.46/ft²</span></p>
+    <header><h3>A5R</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,105</span><span class="permo">/mo</span> </p>
+    <p class="meta">758 sqft · 1 bed · <span class="psf">$1.46/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1105" data-avail=""><span class="u">1805</span><span class="p">$1,105</span><span class="d nowd">now</span><span class="s">$1.46</span></li></ul>
     <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,105 to $1,105"><polyline points="4.0,36.0 15.8,36.0 27.7,36.0 39.5,36.0 51.3,36.0 63.2,36.0 75.0,36.0 86.8,36.0 98.7,36.0 110.5,36.0 122.3,36.0 134.2,36.0 146.0,36.0" fill="none" stroke="var(--series-verlaine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-verlaine)"/><circle cx="4.0" cy="36.0" r="5" fill="transparent"><title>09-08: $1,105</title></circle><circle cx="15.8" cy="36.0" r="5" fill="transparent"><title>09-09: $1,105</title></circle><circle cx="27.7" cy="36.0" r="5" fill="transparent"><title>09-10: $1,105</title></circle><circle cx="39.5" cy="36.0" r="5" fill="transparent"><title>09-11: $1,105</title></circle><circle cx="51.3" cy="36.0" r="5" fill="transparent"><title>09-12: $1,105</title></circle><circle cx="63.2" cy="36.0" r="5" fill="transparent"><title>09-13: $1,105</title></circle><circle cx="75.0" cy="36.0" r="5" fill="transparent"><title>09-14: $1,105</title></circle><circle cx="86.8" cy="36.0" r="5" fill="transparent"><title>09-15: $1,105</title></circle><circle cx="98.7" cy="36.0" r="5" fill="transparent"><title>09-16: $1,105</title></circle><circle cx="110.5" cy="36.0" r="5" fill="transparent"><title>09-17: $1,105</title></circle><circle cx="122.3" cy="36.0" r="5" fill="transparent"><title>09-18: $1,105</title></circle><circle cx="134.2" cy="36.0" r="5" fill="transparent"><title>09-19: $1,105</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $1,105</title></circle></svg><span class="lownote">low $1,105</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-verlaine)" data-price="1140" data-sqft="900" data-psf="1.267">
+<article class="card" style="--series:var(--series-verlaine)" data-price="1140" data-sqft="900" data-psf="1.267" data-basefrom="1140">
   <a class="fig" href="https://www.verlaineontheparkway.com/floorplans/dallas-TX/verlaine-on-the-parkway/b1-709699-1/" target="_blank" rel="noopener"><img src="https://medialibrarycfo.entrata.com/102126/MLv3/4/23/2026/07/17/125900/6a5a7b741af767.39214271395.png" alt="B1 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>B1 <span class="unit">2330</span></h3></header>
-    <p class="price">$1,140<span class="permo">/mo</span> </p>
-    <p class="meta">900 sqft · 2 bed · available now · <span class="psf">$1.27/ft²</span></p>
+    <header><h3>B1</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,140</span><span class="permo">/mo</span> </p>
+    <p class="meta">900 sqft · 2 bed · <span class="psf">$1.27/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1140" data-avail=""><span class="u">2330</span><span class="p">$1,140</span><span class="d nowd">now</span><span class="s">$1.27</span></li></ul>
     <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,140 to $1,140"><polyline points="4.0,36.0 19.8,36.0 35.6,36.0 51.3,36.0 67.1,36.0 82.9,36.0 98.7,36.0 114.4,36.0 130.2,36.0 146.0,36.0" fill="none" stroke="var(--series-verlaine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-verlaine)"/><circle cx="4.0" cy="36.0" r="5" fill="transparent"><title>09-11: $1,140</title></circle><circle cx="19.8" cy="36.0" r="5" fill="transparent"><title>09-12: $1,140</title></circle><circle cx="35.6" cy="36.0" r="5" fill="transparent"><title>09-13: $1,140</title></circle><circle cx="51.3" cy="36.0" r="5" fill="transparent"><title>09-14: $1,140</title></circle><circle cx="67.1" cy="36.0" r="5" fill="transparent"><title>09-15: $1,140</title></circle><circle cx="82.9" cy="36.0" r="5" fill="transparent"><title>09-16: $1,140</title></circle><circle cx="98.7" cy="36.0" r="5" fill="transparent"><title>09-17: $1,140</title></circle><circle cx="114.4" cy="36.0" r="5" fill="transparent"><title>09-18: $1,140</title></circle><circle cx="130.2" cy="36.0" r="5" fill="transparent"><title>09-19: $1,140</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $1,140</title></circle></svg><span class="lownote">low $1,140</span></div>
   </div>
 </article></div>
+  <p class="nomatch" hidden>No homes here match the current filters.</p>
   <details class="tableview"><summary>table view</summary>
-    <table><thead><tr><th>plan</th><th>rent</th><th>sqft</th><th>$/sqft</th><th>beds</th><th>availability</th><th>all-time low</th></tr></thead>
-    <tbody><tr data-price="925" data-sqft="750" data-psf="1.233"><td>A4 1313</td><td>$925</td><td>750</td><td>$1.23</td><td>1</td><td>Available</td><td>$925</td></tr><tr data-price="940" data-sqft="758" data-psf="1.240"><td>A5 2512</td><td>$940</td><td>758</td><td>$1.24</td><td>1</td><td>Available</td><td>$940</td></tr><tr data-price="1050" data-sqft="900" data-psf="1.167"><td>A7 0621</td><td>$1,050</td><td>900</td><td>$1.17</td><td>1</td><td>Available</td><td>$1,050</td></tr><tr data-price="1080" data-sqft="720" data-psf="1.500"><td>A3R 2015</td><td>$1,080</td><td>720</td><td>$1.50</td><td>1</td><td>Available</td><td>$1,080</td></tr><tr data-price="1105" data-sqft="750" data-psf="1.473"><td>A4R 1305</td><td>$1,105</td><td>750</td><td>$1.47</td><td>1</td><td>Available</td><td>$1,105</td></tr><tr data-price="1105" data-sqft="758" data-psf="1.458"><td>A5R 1805</td><td>$1,105</td><td>758</td><td>$1.46</td><td>1</td><td>Available</td><td>$1,105</td></tr><tr data-price="1140" data-sqft="900" data-psf="1.267"><td>B1 2330</td><td>$1,140</td><td>900</td><td>$1.27</td><td>2</td><td>Available</td><td>$1,140</td></tr></tbody></table>
+    <table><thead><tr><th>plan</th><th>rent</th><th>sqft</th><th>$/sqft</th><th>beds</th><th>available</th><th>all-time low</th></tr></thead>
+    <tbody><tr data-price="925" data-sqft="750" data-psf="1.233" data-avail=""><td>A4 1313</td><td>$925</td><td>750</td><td>$1.23</td><td>1</td><td>now</td><td>$925</td></tr><tr data-price="940" data-sqft="758" data-psf="1.240" data-avail=""><td>A5 2512</td><td>$940</td><td>758</td><td>$1.24</td><td>1</td><td>now</td><td>$940</td></tr><tr data-price="1050" data-sqft="900" data-psf="1.167" data-avail=""><td>A7 0621</td><td>$1,050</td><td>900</td><td>$1.17</td><td>1</td><td>now</td><td>$1,050</td></tr><tr data-price="1080" data-sqft="720" data-psf="1.500" data-avail=""><td>A3R 2015</td><td>$1,080</td><td>720</td><td>$1.50</td><td>1</td><td>now</td><td>$1,080</td></tr><tr data-price="1105" data-sqft="750" data-psf="1.473" data-avail=""><td>A4R 1305</td><td>$1,105</td><td>750</td><td>$1.47</td><td>1</td><td>now</td><td>$1,105</td></tr><tr data-price="1105" data-sqft="758" data-psf="1.458" data-avail=""><td>A5R 1805</td><td>$1,105</td><td>758</td><td>$1.46</td><td>1</td><td>now</td><td>$1,105</td></tr><tr data-price="1140" data-sqft="900" data-psf="1.267" data-avail=""><td>B1 2330</td><td>$1,140</td><td>900</td><td>$1.27</td><td>2</td><td>now</td><td>$1,140</td></tr></tbody></table>
   </details>
 </section>
 <section class="property" id="fairway" style="--series:var(--series-fairway)">
   <h2><span class="dot" aria-hidden="true"></span>Fairway (Plano)
-    <span class="sub">2 homes · from $1,190</span>
+    <span class="sub"><span class="cnt">2</span> homes · from <span class="frm">$1,190</span></span>
     <a class="srclink" href="https://www.harborgroupmanagement.com/apartments/tx/plano/fairway/floor-plans" target="_blank" rel="noopener">view on site ↗</a>
   </h2>
-  <div class="grid"><article class="card" style="--series:var(--series-fairway)" data-price="1190" data-sqft="677" data-psf="1.758">
+  <div class="grid"><article class="card" style="--series:var(--series-fairway)" data-price="1190" data-sqft="677" data-psf="1.758" data-basefrom="1190">
   <a class="fig" href="https://www.harborgroupmanagement.com/apartments/tx/plano/fairway/bayhill/listing" target="_blank" rel="noopener"><img src="https://media.hgmc.io/floorplan/FAI/1X1A/bayhill.png" alt="Bayhill floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>Bayhill <span class="unit">#01-2051</span></h3><span class="badge atl">★ all-time low</span></header>
-    <p class="price">$1,190<span class="permo">/mo</span> <span class="delta down">▼ $5 today</span></p>
-    <p class="meta">677 sqft · 1 bed · moves in Sep 21 · <span class="psf">$1.76/ft²</span></p>
+    <header><h3>Bayhill</h3><span class="badge atl">★ all-time low</span></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,190</span><span class="permo">/mo</span> <span class="delta down">▼ $5 today</span></p>
+    <p class="meta">677 sqft · 1 bed · <span class="psf">$1.76/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1190" data-avail="2026-09-21"><span class="u">#01-2051</span><span class="p">$1,190</span><span class="d">Sep 21</span><span class="s">$1.76</span></li><li class="unit-row" data-price="1195" data-avail="2026-10-05"><span class="u">#01-2130</span><span class="p">$1,195</span><span class="d">Oct 5</span><span class="s">$1.77</span></li></ul>
     <div class="sparkrow"><svg class="spark" viewBox="0 0 150 40" width="150" height="40" role="img" aria-label="rent history, $1,190 to $1,195"><polyline points="4.0,12.0 51.3,12.0 98.7,12.0 146.0,36.0" fill="none" stroke="var(--series-fairway)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="146.0" cy="36.0" r="3" fill="var(--series-fairway)"/><circle cx="4.0" cy="12.0" r="5" fill="transparent"><title>09-17: $1,195</title></circle><circle cx="51.3" cy="12.0" r="5" fill="transparent"><title>09-18: $1,195</title></circle><circle cx="98.7" cy="12.0" r="5" fill="transparent"><title>09-19: $1,195</title></circle><circle cx="146.0" cy="36.0" r="5" fill="transparent"><title>09-20: $1,190</title></circle></svg><span class="lownote">low $1,190</span></div>
   </div>
-</article>
-<article class="card" style="--series:var(--series-fairway)" data-price="1195" data-sqft="677" data-psf="1.765">
-  <a class="fig" href="https://www.harborgroupmanagement.com/apartments/tx/plano/fairway/bayhill/listing" target="_blank" rel="noopener"><img src="https://media.hgmc.io/floorplan/FAI/1X1A/bayhill.png" alt="Bayhill floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
-  <div class="card-body">
-    <header><h3>Bayhill <span class="unit">#01-2130</span></h3></header>
-    <p class="price">$1,195<span class="permo">/mo</span> </p>
-    <p class="meta">677 sqft · 1 bed · moves in Oct 5 · <span class="psf">$1.77/ft²</span></p>
-    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $1,195</span></div>
-  </div>
 </article></div>
+  <p class="nomatch" hidden>No homes here match the current filters.</p>
   <details class="tableview"><summary>table view</summary>
-    <table><thead><tr><th>plan</th><th>rent</th><th>sqft</th><th>$/sqft</th><th>beds</th><th>availability</th><th>all-time low</th></tr></thead>
-    <tbody><tr data-price="1190" data-sqft="677" data-psf="1.758"><td>Bayhill #01-2051</td><td>$1,190</td><td>677</td><td>$1.76</td><td>1</td><td>Sep 21, 2026</td><td>$1,190</td></tr><tr data-price="1195" data-sqft="677" data-psf="1.765"><td>Bayhill #01-2130</td><td>$1,195</td><td>677</td><td>$1.77</td><td>1</td><td>Oct 5, 2026</td><td>$1,195</td></tr></tbody></table>
+    <table><thead><tr><th>plan</th><th>rent</th><th>sqft</th><th>$/sqft</th><th>beds</th><th>available</th><th>all-time low</th></tr></thead>
+    <tbody><tr data-price="1190" data-sqft="677" data-psf="1.758" data-avail="2026-09-21"><td>Bayhill #01-2051</td><td>$1,190</td><td>677</td><td>$1.76</td><td>1</td><td>Sep 21</td><td>$1,190</td></tr><tr data-price="1195" data-sqft="677" data-psf="1.765" data-avail="2026-10-05"><td>Bayhill #01-2130</td><td>$1,195</td><td>677</td><td>$1.77</td><td>1</td><td>Oct 5</td><td>$1,195</td></tr></tbody></table>
   </details>
 </section>
 <section class="property" id="windridge" style="--series:var(--series-windridge)">
   <h2><span class="dot" aria-hidden="true"></span>Windridge (Addison)
-    <span class="sub">10 homes · from $716</span>
+    <span class="sub"><span class="cnt">10</span> homes · from <span class="frm">$716</span></span>
     <a class="srclink" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener">view on site ↗</a>
   </h2>
-  <div class="grid"><article class="card" style="--series:var(--series-windridge)" data-price="716" data-sqft="657" data-psf="1.090">
+  <div class="grid"><article class="card" style="--series:var(--series-windridge)" data-price="716" data-sqft="657" data-psf="1.090" data-basefrom="716">
   <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3204525_3-226-5_3dsplus_web.jpg" alt="A5 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A5 <span class="unit">#1074</span></h3></header>
-    <p class="price">$716<span class="permo">/mo</span> </p>
-    <p class="meta">657 sqft · 1 bed · moves in 11/19/ · <span class="psf">$1.09/ft²</span></p>
+    <header><h3>A5</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$716</span><span class="permo">/mo</span> </p>
+    <p class="meta">657 sqft · 1 bed · <span class="psf">$1.09/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="716" data-avail="2026-11-19"><span class="u">#1074</span><span class="p">$716</span><span class="d">Nov 19</span><span class="s">$1.09</span></li><li class="unit-row" data-price="781" data-avail=""><span class="u">#2079</span><span class="p">$781</span><span class="d nowd">now</span><span class="s">$1.19</span></li><li class="unit-row" data-price="781" data-avail=""><span class="u">#2090</span><span class="p">$781</span><span class="d nowd">now</span><span class="s">$1.19</span></li></ul>
     <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $716</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-windridge)" data-price="781" data-sqft="657" data-psf="1.189">
-  <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3204525_3-226-5_3dsplus_web.jpg" alt="A5 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
-  <div class="card-body">
-    <header><h3>A5 <span class="unit">#2079</span></h3></header>
-    <p class="price">$781<span class="permo">/mo</span> </p>
-    <p class="meta">657 sqft · 1 bed · available now · <span class="psf">$1.19/ft²</span></p>
-    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $781</span></div>
-  </div>
-</article>
-<article class="card" style="--series:var(--series-windridge)" data-price="781" data-sqft="657" data-psf="1.189">
-  <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3204525_3-226-5_3dsplus_web.jpg" alt="A5 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
-  <div class="card-body">
-    <header><h3>A5 <span class="unit">#2090</span></h3></header>
-    <p class="price">$781<span class="permo">/mo</span> </p>
-    <p class="meta">657 sqft · 1 bed · available now · <span class="psf">$1.19/ft²</span></p>
-    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $781</span></div>
-  </div>
-</article>
-<article class="card" style="--series:var(--series-windridge)" data-price="876" data-sqft="708" data-psf="1.237">
+<article class="card" style="--series:var(--series-windridge)" data-price="876" data-sqft="708" data-psf="1.237" data-basefrom="876">
   <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3407441_4-226-5_3dsplus_web.jpg" alt="T2 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>T2 <span class="unit">#1082</span></h3></header>
-    <p class="price">$876<span class="permo">/mo</span> </p>
-    <p class="meta">708 sqft · 1 bed · available now · <span class="psf">$1.24/ft²</span></p>
+    <header><h3>T2</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$876</span><span class="permo">/mo</span> </p>
+    <p class="meta">708 sqft · 1 bed · <span class="psf">$1.24/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="876" data-avail=""><span class="u">#1082</span><span class="p">$876</span><span class="d nowd">now</span><span class="s">$1.24</span></li><li class="unit-row" data-price="876" data-avail="2026-11-14"><span class="u">#1066</span><span class="p">$876</span><span class="d">Nov 14</span><span class="s">$1.24</span></li><li class="unit-row" data-price="961" data-avail=""><span class="u">#1071</span><span class="p">$961</span><span class="d nowd">now</span><span class="s">$1.36</span></li></ul>
     <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $876</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-windridge)" data-price="876" data-sqft="708" data-psf="1.237">
-  <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3407441_4-226-5_3dsplus_web.jpg" alt="T2 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
-  <div class="card-body">
-    <header><h3>T2 <span class="unit">#1066</span></h3></header>
-    <p class="price">$876<span class="permo">/mo</span> </p>
-    <p class="meta">708 sqft · 1 bed · moves in 11/14/ · <span class="psf">$1.24/ft²</span></p>
-    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $876</span></div>
-  </div>
-</article>
-<article class="card" style="--series:var(--series-windridge)" data-price="961" data-sqft="708" data-psf="1.357">
-  <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/3407441_4-226-5_3dsplus_web.jpg" alt="T2 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
-  <div class="card-body">
-    <header><h3>T2 <span class="unit">#1071</span></h3></header>
-    <p class="price">$961<span class="permo">/mo</span> </p>
-    <p class="meta">708 sqft · 1 bed · available now · <span class="psf">$1.36/ft²</span></p>
-    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $961</span></div>
-  </div>
-</article>
-<article class="card" style="--series:var(--series-windridge)" data-price="1082" data-sqft="749" data-psf="1.445">
+<article class="card" style="--series:var(--series-windridge)" data-price="1082" data-sqft="749" data-psf="1.445" data-basefrom="1082">
   <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/x_123,y_224,w_1501,h_1271,c_crop/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/a6_3dsplus_web-%20resized%20(square)(1).jpg" alt="A6 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>A6 <span class="unit">#1609</span></h3></header>
-    <p class="price">$1,082<span class="permo">/mo</span> </p>
-    <p class="meta">749 sqft · 1 bed · moves in 10/31/ · <span class="psf">$1.44/ft²</span></p>
+    <header><h3>A6</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,082</span><span class="permo">/mo</span> </p>
+    <p class="meta">749 sqft · 1 bed · <span class="psf">$1.44/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1082" data-avail="2026-10-31"><span class="u">#1609</span><span class="p">$1,082</span><span class="d">Oct 31</span><span class="s">$1.44</span></li></ul>
     <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $1,082</span></div>
   </div>
 </article>
-<article class="card" style="--series:var(--series-windridge)" data-price="1139" data-sqft="987" data-psf="1.154">
+<article class="card" style="--series:var(--series-windridge)" data-price="1139" data-sqft="987" data-psf="1.154" data-basefrom="1139">
   <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/b6_3dsplus_web.jpg" alt="B6 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
   <div class="card-body">
-    <header><h3>B6 <span class="unit">#2054</span></h3></header>
-    <p class="price">$1,139<span class="permo">/mo</span> </p>
-    <p class="meta">987 sqft · 2 bed · available now · <span class="psf">$1.15/ft²</span></p>
+    <header><h3>B6</h3></header>
+    <p class="price"><span class="fromlbl">from</span> <span class="amt">$1,139</span><span class="permo">/mo</span> </p>
+    <p class="meta">987 sqft · 2 bed · <span class="psf">$1.15/ft²</span></p>
+    <ul class="units"><li class="unit-row" data-price="1139" data-avail=""><span class="u">#2054</span><span class="p">$1,139</span><span class="d nowd">now</span><span class="s">$1.15</span></li><li class="unit-row" data-price="1139" data-avail=""><span class="u">#2057</span><span class="p">$1,139</span><span class="d nowd">now</span><span class="s">$1.15</span></li><li class="unit-row" data-price="1169" data-avail="2026-10-27"><span class="u">#1803</span><span class="p">$1,169</span><span class="d">Oct 27</span><span class="s">$1.18</span></li></ul>
     <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $1,139</span></div>
-  </div>
-</article>
-<article class="card" style="--series:var(--series-windridge)" data-price="1139" data-sqft="987" data-psf="1.154">
-  <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/b6_3dsplus_web.jpg" alt="B6 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
-  <div class="card-body">
-    <header><h3>B6 <span class="unit">#2057</span></h3></header>
-    <p class="price">$1,139<span class="permo">/mo</span> </p>
-    <p class="meta">987 sqft · 2 bed · available now · <span class="psf">$1.15/ft²</span></p>
-    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $1,139</span></div>
-  </div>
-</article>
-<article class="card" style="--series:var(--series-windridge)" data-price="1169" data-sqft="987" data-psf="1.184">
-  <a class="fig" href="https://www.windridgeapartments.com/floorplans" target="_blank" rel="noopener"><img src="https://resource.rentcafe.com/image/upload/q_auto,f_auto,c_limit,w_576,h_260/s3/2/31151/b6_3dsplus_web.jpg" alt="B6 floor plan" loading="lazy" onerror="this.closest('.fig').style.display='none'"></a>
-  <div class="card-body">
-    <header><h3>B6 <span class="unit">#1803</span></h3></header>
-    <p class="price">$1,169<span class="permo">/mo</span> </p>
-    <p class="meta">987 sqft · 2 bed · moves in 10/27/ · <span class="psf">$1.18/ft²</span></p>
-    <div class="sparkrow"><div class="spark spark-flat">tracking since today</div><span class="lownote">low $1,169</span></div>
   </div>
 </article></div>
+  <p class="nomatch" hidden>No homes here match the current filters.</p>
   <details class="tableview"><summary>table view</summary>
-    <table><thead><tr><th>plan</th><th>rent</th><th>sqft</th><th>$/sqft</th><th>beds</th><th>availability</th><th>all-time low</th></tr></thead>
-    <tbody><tr data-price="716" data-sqft="657" data-psf="1.090"><td>A5 #1074</td><td>$716</td><td>657</td><td>$1.09</td><td>1</td><td>11/19/2026</td><td>$716</td></tr><tr data-price="781" data-sqft="657" data-psf="1.189"><td>A5 #2079</td><td>$781</td><td>657</td><td>$1.19</td><td>1</td><td>Available</td><td>$781</td></tr><tr data-price="781" data-sqft="657" data-psf="1.189"><td>A5 #2090</td><td>$781</td><td>657</td><td>$1.19</td><td>1</td><td>Available</td><td>$781</td></tr><tr data-price="876" data-sqft="708" data-psf="1.237"><td>T2 #1082</td><td>$876</td><td>708</td><td>$1.24</td><td>1</td><td>Available</td><td>$876</td></tr><tr data-price="876" data-sqft="708" data-psf="1.237"><td>T2 #1066</td><td>$876</td><td>708</td><td>$1.24</td><td>1</td><td>11/14/2026</td><td>$876</td></tr><tr data-price="961" data-sqft="708" data-psf="1.357"><td>T2 #1071</td><td>$961</td><td>708</td><td>$1.36</td><td>1</td><td>Available</td><td>$961</td></tr><tr data-price="1082" data-sqft="749" data-psf="1.445"><td>A6 #1609</td><td>$1,082</td><td>749</td><td>$1.44</td><td>1</td><td>10/31/2026</td><td>$1,082</td></tr><tr data-price="1139" data-sqft="987" data-psf="1.154"><td>B6 #2054</td><td>$1,139</td><td>987</td><td>$1.15</td><td>2</td><td>Available</td><td>$1,139</td></tr><tr data-price="1139" data-sqft="987" data-psf="1.154"><td>B6 #2057</td><td>$1,139</td><td>987</td><td>$1.15</td><td>2</td><td>Available</td><td>$1,139</td></tr><tr data-price="1169" data-sqft="987" data-psf="1.184"><td>B6 #1803</td><td>$1,169</td><td>987</td><td>$1.18</td><td>2</td><td>10/27/2026</td><td>$1,169</td></tr></tbody></table>
+    <table><thead><tr><th>plan</th><th>rent</th><th>sqft</th><th>$/sqft</th><th>beds</th><th>available</th><th>all-time low</th></tr></thead>
+    <tbody><tr data-price="716" data-sqft="657" data-psf="1.090" data-avail="2026-11-19"><td>A5 #1074</td><td>$716</td><td>657</td><td>$1.09</td><td>1</td><td>Nov 19</td><td>$716</td></tr><tr data-price="781" data-sqft="657" data-psf="1.189" data-avail=""><td>A5 #2079</td><td>$781</td><td>657</td><td>$1.19</td><td>1</td><td>now</td><td>$781</td></tr><tr data-price="781" data-sqft="657" data-psf="1.189" data-avail=""><td>A5 #2090</td><td>$781</td><td>657</td><td>$1.19</td><td>1</td><td>now</td><td>$781</td></tr><tr data-price="876" data-sqft="708" data-psf="1.237" data-avail=""><td>T2 #1082</td><td>$876</td><td>708</td><td>$1.24</td><td>1</td><td>now</td><td>$876</td></tr><tr data-price="876" data-sqft="708" data-psf="1.237" data-avail="2026-11-14"><td>T2 #1066</td><td>$876</td><td>708</td><td>$1.24</td><td>1</td><td>Nov 14</td><td>$876</td></tr><tr data-price="961" data-sqft="708" data-psf="1.357" data-avail=""><td>T2 #1071</td><td>$961</td><td>708</td><td>$1.36</td><td>1</td><td>now</td><td>$961</td></tr><tr data-price="1082" data-sqft="749" data-psf="1.445" data-avail="2026-10-31"><td>A6 #1609</td><td>$1,082</td><td>749</td><td>$1.44</td><td>1</td><td>Oct 31</td><td>$1,082</td></tr><tr data-price="1139" data-sqft="987" data-psf="1.154" data-avail=""><td>B6 #2054</td><td>$1,139</td><td>987</td><td>$1.15</td><td>2</td><td>now</td><td>$1,139</td></tr><tr data-price="1139" data-sqft="987" data-psf="1.154" data-avail=""><td>B6 #2057</td><td>$1,139</td><td>987</td><td>$1.15</td><td>2</td><td>now</td><td>$1,139</td></tr><tr data-price="1169" data-sqft="987" data-psf="1.184" data-avail="2026-10-27"><td>B6 #1803</td><td>$1,169</td><td>987</td><td>$1.18</td><td>2</td><td>Oct 27</td><td>$1,169</td></tr></tbody></table>
   </details>
 </section>
   <footer>
-    <p>Updated Sun, 20 Sep 2026 17:46:20 GMT. Prices are each property's advertised base rent for the cheapest
+    <p>Updated Sun, 20 Sep 2026 18:16:00 GMT. Prices are each property's advertised base rent for the cheapest
     lease term and change frequently — confirm on the property's own page before acting.
-    Davenport &amp; Verlaine are tracked per floor plan; Fairway per unit.
+    Cards group units by floor plan; each unit lists its own price and move-in date.
     Floor plan images load directly from each property's website and belong to them.</p>
     <p>Generated by a <a href="https://github.com/aswinsreeram01/AptPrices">rent watcher</a> that polls hourly and publishes on change.</p>
   </footer>
 </div>
 <script>
 (function () {
-  var buttons = document.querySelectorAll('.sortbtn');
-  function apply(key, dir) {
-    var mul = dir === 'desc' ? -1 : 1;
-    // Sort within each property section; cards and table rows share the attrs.
+  var buttons = document.querySelectorAll('.sortbtn[data-sort]');
+  var rentEl = document.getElementById('f-rent');
+  var rentOut = document.getElementById('f-rent-out');
+  var dateEl = document.getElementById('f-date');
+  var resetEl = document.getElementById('f-reset');
+  var countEl = document.getElementById('f-count');
+  var RENT_MAX = parseInt(rentEl.max, 10);
+  var usd = function (n) { return '$' + Number(n).toLocaleString('en-US'); };
+
+  function sortNow() {
+    var btn = document.querySelector('.sortbtn.active[data-sort]');
+    if (!btn) return;
+    var key = btn.dataset.sort, mul = btn.dataset.dir === 'desc' ? -1 : 1;
     document.querySelectorAll('.grid, .tableview tbody').forEach(function (box) {
       Array.prototype.slice.call(box.children)
         .sort(function (a, b) {
@@ -470,18 +480,115 @@ footer a { color: inherit; }
         .forEach(function (el) { box.appendChild(el); });
     });
   }
+
+  // A unit passes when it is cheap enough AND available by the chosen date.
+  // "Available now" (empty data-avail) always passes the date test; so does a
+  // plan-level card, which has no per-unit dates to test.
+  function passes(price, iso, maxRent, byDate) {
+    if (price > maxRent) return false;
+    if (byDate && iso && iso > byDate) return false;
+    return true;
+  }
+
+  function applyFilters() {
+    var maxRent = parseInt(rentEl.value, 10);
+    var byDate = dateEl.value || '';
+    rentOut.textContent = usd(maxRent);
+    var shownHomes = 0, cheapest = null;
+
+    document.querySelectorAll('section.property').forEach(function (sec) {
+      var visibleCards = 0, secHomes = 0, secFrom = null;
+
+      sec.querySelectorAll('.card').forEach(function (card) {
+        var unitRows = card.querySelectorAll('.unit-row');
+        var anyVisible = false, cardFrom = null, cardHomes = 0;
+
+        if (!unitRows.length) {
+          // Plan-level card: no per-unit rows, filter on the card's own price.
+          var p = parseFloat(card.dataset.basefrom || card.dataset.price || 0);
+          anyVisible = passes(p, '', maxRent, byDate);
+          if (anyVisible) { cardFrom = p; cardHomes = 1; }
+        } else {
+          unitRows.forEach(function (u) {
+            var ok = passes(parseFloat(u.dataset.price || 0), u.dataset.avail || '', maxRent, byDate);
+            u.hidden = !ok;
+            if (ok) {
+              anyVisible = true;
+              cardHomes++;
+              var up = parseFloat(u.dataset.price || 0);
+              if (cardFrom === null || up < cardFrom) cardFrom = up;
+            }
+          });
+        }
+
+        card.hidden = !anyVisible;
+        if (anyVisible) {
+          visibleCards++;
+          secHomes += cardHomes;
+          // Headline price follows the cheapest unit that survived the filter.
+          var amt = card.querySelector('.price .amt');
+          if (amt && cardFrom !== null) amt.textContent = usd(cardFrom);
+          if (cardFrom !== null) {
+            card.dataset.price = cardFrom;
+            var sq = parseFloat(card.dataset.sqft || 0);
+            if (sq) card.dataset.psf = (cardFrom / sq).toFixed(3);
+            if (secFrom === null || cardFrom < secFrom) secFrom = cardFrom;
+            if (cheapest === null || cardFrom < cheapest) cheapest = cardFrom;
+          }
+        }
+      });
+
+      sec.querySelectorAll('.tableview tbody tr').forEach(function (tr) {
+        tr.hidden = !passes(parseFloat(tr.dataset.price || 0), tr.dataset.avail || '', maxRent, byDate);
+      });
+
+      shownHomes += secHomes;
+      var nomatch = sec.querySelector('.nomatch');
+      if (nomatch) nomatch.hidden = visibleCards > 0;
+      var cnt = sec.querySelector('.sub .cnt');
+      if (cnt) cnt.textContent = secHomes;
+      var frm = sec.querySelector('.sub .frm');
+      if (frm) frm.textContent = secFrom === null ? '—' : usd(secFrom);
+    });
+
+    // Tiles track the filtered view so the headline never contradicts the list.
+    var filtered = maxRent < RENT_MAX || byDate;
+    var homesEl = document.getElementById('t-homes');
+    var cheapEl = document.getElementById('t-cheap');
+    if (homesEl) homesEl.textContent = shownHomes;
+    if (cheapEl) cheapEl.textContent = cheapest === null ? '—' : usd(cheapest);
+    countEl.textContent = filtered ? shownHomes + ' of ' + countEl.dataset.total + ' homes match' : '';
+    sortNow();
+  }
+
+  countEl.dataset.total = (function () {
+    var n = 0;
+    document.querySelectorAll('.unit-row').forEach(function () { n++; });
+    document.querySelectorAll('.card').forEach(function (c) { if (!c.querySelector('.unit-row')) n++; });
+    return n;
+  })();
+
   buttons.forEach(function (btn) {
     btn.addEventListener('click', function () {
       if (btn.classList.contains('active')) {
-        // second click flips direction
-        btn.dataset.dir = btn.dataset.dir === 'asc' ? 'desc' : 'asc';
+        btn.dataset.dir = btn.dataset.dir === 'asc' ? 'desc' : 'asc'; // second click flips
       } else {
         buttons.forEach(function (b) { b.classList.remove('active'); });
         btn.classList.add('active');
       }
-      apply(btn.dataset.sort, btn.dataset.dir);
+      sortNow();
     });
   });
+
+  rentEl.addEventListener('input', applyFilters);
+  dateEl.addEventListener('change', applyFilters);
+  resetEl.addEventListener('click', function () {
+    rentEl.value = RENT_MAX;
+    dateEl.value = '';
+    applyFilters();
+  });
+
+  applyFilters();
 })();
 </script>
 </body>
